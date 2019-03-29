@@ -1,38 +1,53 @@
 import React, { FC } from 'react'
 import styled from 'styled-components'
+import { Header } from './Header'
+import { SubtitleList } from './SubtitleList'
+import { VideoPlayer } from './VideoPlayer'
+import { Timeline } from './Timeline'
+import { Grid } from '../Atomics/Grid'
 import { Div } from '../Atomics/Div'
 
-const Layout = Div
+const Layout = styled(Div)`
+  width: 100vw;
+  height: 100vh;
 
-const Header = styled.header``
+  padding-top: 3rem;
+`
 
-const Title = Div
+const Main = styled(Grid.Horizontal)`
+  grid-gap: 1rem;
+  grid-template-columns: 1fr min-content;
 
-const Main = styled.main``
+  max-width: 64rem;
+  width: 100%;
+  height: 100%;
 
-const Left = Div
+  margin: 0 auto;
+  padding: 1rem;
 
-const SubtitleList = Div
+  background-color: white;
+  box-shadow: 0 0 0 1px hsl(0 0% 84%);
+`
 
-const Right = Div
+const Left = Grid.Vertical
 
-const Video = Div
-
-const Timeline = Div
+const Right = styled(Grid.Vertical)`
+  grid-template-rows: min-content 1fr;
+`
 
 export const App: FC = () => (
-  <Layout>
-    <Header>
-      <Title>Subtitler</Title>
-    </Header>
-    <Main>
-      <Left>
-        <SubtitleList>SubtitleList</SubtitleList>
-      </Left>
-      <Right>
-        <Video>Video</Video>
-        <Timeline>Timeline</Timeline>
-      </Right>
-    </Main>
-  </Layout>
+  <>
+    <Header />
+    <Layout>
+      <Main as="main">
+        <Left>
+          <SubtitleList />
+        </Left>
+        <Right>
+          <VideoPlayer />
+          <Timeline />
+        </Right>
+      </Main>
+    </Layout>
+  </>
 )

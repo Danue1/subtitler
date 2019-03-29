@@ -19,6 +19,7 @@ export const Clearfix = createGlobalStyle`
     min-height: 32rem;
 
     font-size: 16px;
+    background-color: hsl(0 0% 96%);
   }
 
   html,
