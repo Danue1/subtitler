@@ -72,6 +72,7 @@ export const Clearfix = createGlobalStyle`
   }
 
   input,
+  textarea,
   button {
     border: 0;
     border-radius: 0;

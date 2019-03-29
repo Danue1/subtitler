@@ -29,7 +29,7 @@ const Main = styled(Grid.Horizontal)`
   box-shadow: 0 0 0 1px hsl(0 0% 84%);
 `
 
-const Left = Grid.Vertical
+const Left = Div
 
 const Right = styled(Grid.Vertical)`
   grid-template-rows: min-content 1fr;
