@@ -24,6 +24,11 @@ const Textarea = styled.textarea`
   resize: none;
 
   box-shadow: 0 0 0 0.5px hsl(0 0% 84%);
+
+  &:hover,
+  &:focus {
+    box-shadow: 0 0 0 0.5px hsl(0 0% 64%);
+  }
 `
 
 const UnhintedSubtitle = styled(Grid.Horizontal)`
@@ -43,7 +48,13 @@ const UnhintedSubtitle = styled(Grid.Horizontal)`
   }
 `
 
-const HintedSubtitle = styled(UnhintedSubtitle)`
+const RemovingHintedSubtitle = styled(UnhintedSubtitle)`
+  &:hover {
+    background-color: hsl(0 100% 96%);
+  }
+`
+
+const AddingHintedSubtitle = styled(UnhintedSubtitle)`
   border-bottom-color: hsl(210 100% 84%);
 `
 
@@ -68,7 +79,7 @@ const Time = styled.input`
 
 const RemoveButton = styled(Div)`
   &:hover {
-    box-shadow: 0 0 0 1px hsl(-30 100% 84%);
+    box-shadow: 0 0 0 1px hsl(0 100% 84%);
   }
 `
 
@@ -99,7 +110,8 @@ type OnChangeTextarea = ChangeEventHandler<HTMLTextAreaElement>
 export const SubtitleList: FC = () => {
   const [subtitleList, dispatchSubtitleList] = useSubtitleList()
 
-  const [hintIndex, setHintIndex] = useState<number>(-1)
+  const [addingHintIndex, setAddingHintIndex] = useState<number>(-1)
+  const [removingHintIndex, setRemovingHintIndex] = useState<number>(-1)
 
   const updateStartsAt = (index: number): OnBlurFromTime => event => {
     dispatchSubtitleList({ type: 'edit::startsAt', index, startsAt: event.target.value })
@@ -116,19 +128,24 @@ export const SubtitleList: FC = () => {
     dispatchSubtitleList({ type: 'edit::text', index, text: currentTarget.value })
   }
 
-  const displayHintToAddingNewSubtitle = (index: number) => () => {
-    setHintIndex(index)
-  }
+  const displayHintToRemovingCurrentSubtitle = (index: number) => () => setRemovingHintIndex(index)
 
-  const clearHintTOAddingNewSubtitle = (index: number) => () => {
-    setHintIndex(-1)
-  }
+  const clearHintToRemovingCurrentSubtitle = () => setRemovingHintIndex(-1)
+
+  const displayHintToAddingNewSubtitle = (index: number) => () => setAddingHintIndex(index)
+
+  const clearHintTOAddingNewSubtitle = () => setAddingHintIndex(-1)
 
   return (
     <Layout>
       <Scroll>
         {subtitleList.map(({ startsAt, endsAt, text }, index) => {
-          const Subtitle = index === hintIndex ? HintedSubtitle : UnhintedSubtitle
+          const Subtitle =
+            index === removingHintIndex
+              ? RemovingHintedSubtitle
+              : index === addingHintIndex
+              ? AddingHintedSubtitle
+              : UnhintedSubtitle
           return (
             <Subtitle key={index}>
               <Times>
@@ -137,10 +154,15 @@ export const SubtitleList: FC = () => {
               </Times>
               <Textarea defaultValue={text} rows={2} onChange={onChangeTextarea(index)} />
               <Buttons>
-                <RemoveButton>X</RemoveButton>
+                <RemoveButton
+                  onMouseEnter={displayHintToRemovingCurrentSubtitle(index)}
+                  onMouseLeave={clearHintToRemovingCurrentSubtitle}
+                >
+                  X
+                </RemoveButton>
                 <AddButton
                   onMouseEnter={displayHintToAddingNewSubtitle(index)}
-                  onMouseLeave={clearHintTOAddingNewSubtitle(index)}
+                  onMouseLeave={clearHintTOAddingNewSubtitle}
                 >
                   +
                 </AddButton>
