@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import { useSubtitleList } from './useSubtitleList'
 import { Div } from '../../Atomics/Div'
 import { Grid } from '../../Atomics/Grid'
+import { Plus } from '../../Components/Icons/Plus'
+import { Cross } from '../../Components/Icons/Cross'
 
 const Layout = styled(Div)`
   overflow: hidden;
@@ -158,13 +160,13 @@ export const SubtitleList: FC = () => {
                   onMouseEnter={displayHintToRemovingCurrentSubtitle(index)}
                   onMouseLeave={clearHintToRemovingCurrentSubtitle}
                 >
-                  X
+                  <Cross />
                 </RemoveButton>
                 <AddButton
                   onMouseEnter={displayHintToAddingNewSubtitle(index)}
                   onMouseLeave={clearHintTOAddingNewSubtitle}
                 >
-                  +
+                  <Plus />
                 </AddButton>
               </Buttons>
             </Subtitle>
