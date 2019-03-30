@@ -1,10 +1,12 @@
-import React, { FC, FocusEventHandler, ChangeEventHandler, MouseEventHandler, useState } from 'react'
+import React, { FC, useState } from 'react'
+import classnames from 'classnames'
 import styled from 'styled-components'
 import { useSubtitleList } from './useSubtitleList'
 import { Div } from '../../Atomics/Div'
 import { Grid } from '../../Atomics/Grid'
 import { Plus } from '../../Components/Icons/Plus'
 import { Cross } from '../../Components/Icons/Cross'
+import { Hash } from './Hash'
 
 const Layout = styled(Div)`
   overflow: hidden;
@@ -12,7 +14,7 @@ const Layout = styled(Div)`
   border-radius: 0.25rem;
 
   &:hover {
-    box-shadow: 0 0 0 1px hsl(0 0% 84%);
+    box-shadow: 0 0 0 1px hsl(0 0% 92%);
   }
 `
 
@@ -25,15 +27,20 @@ const Scroll = styled(Div)`
 const Textarea = styled.textarea`
   resize: none;
 
-  box-shadow: 0 0 0 0.5px hsl(0 0% 84%);
+  color: hsl(0 0% 36%);
+  border: 1px solid hsl(0 0% 92%);
 
   &:hover,
   &:focus {
-    box-shadow: 0 0 0 0.5px hsl(0 0% 64%);
+    border-color: hsl(210 100% 84%);
+  }
+
+  &:focus.RemovingHint {
+    border-color: hsl(0 0% 84%);
   }
 `
 
-const UnhintedSubtitle = styled(Grid.Horizontal)`
+const Subtitle = styled(Grid.Horizontal)`
   grid-gap: 0.5rem;
   grid-template-columns: min-content 1fr;
 
@@ -48,16 +55,18 @@ const UnhintedSubtitle = styled(Grid.Horizontal)`
       background-color: white;
     }
   }
-`
 
-const RemovingHintedSubtitle = styled(UnhintedSubtitle)`
-  &:hover {
-    background-color: hsl(0 100% 96%);
+  &.RemovingHint {
+    &:hover {
+      background-color: hsl(0 100% 96%);
+    }
   }
-`
 
-const AddingHintedSubtitle = styled(UnhintedSubtitle)`
-  border-bottom-color: hsl(210 100% 84%);
+  &.AddingHint {
+    &:hover {
+      border-bottom-color: hsl(210 100% 84%);
+    }
+  }
 `
 
 const Times = styled(Grid.Layout)`
@@ -67,26 +76,18 @@ const Times = styled(Grid.Layout)`
   padding: 0.5rem;
 `
 
-const Time = styled.input`
-  width: 11ch;
+const Time = styled(Div)`
+  cursor: pointer;
+
+  width: 10ch;
 
   padding: 0.25rem;
+
+  color: hsl(0 0% 64%);
 
   &:hover,
   &:focus {
     background-color: white;
-    box-shadow: 0 0 0 1px hsl(0 0% 84%);
-  }
-`
-
-const RemoveButton = styled(Div)`
-  &:hover {
-    box-shadow: 0 0 0 1px hsl(0 100% 84%);
-  }
-`
-
-const AddButton = styled(Div)`
-  &:hover {
     box-shadow: 0 0 0 1px hsl(210 100% 84%);
   }
 `
@@ -95,76 +96,97 @@ const Buttons = styled(Grid.Layout)`
   cursor: pointer;
 
   grid-gap: 0.5rem;
+  align-content: space-between;
+`
 
-  ${RemoveButton},
-  ${AddButton} {
-    padding: 0.5rem;
+const Button = styled(Div)`
+  width: 2rem;
+  height: 2rem;
 
-    &:hover {
-      background-color: white;
-    }
+  padding: 0.5rem;
+
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: white;
   }
 `
 
-type OnBlurFromTime = FocusEventHandler<HTMLInputElement>
-type OnChangeTextarea = ChangeEventHandler<HTMLTextAreaElement>
+const RemoveButton = styled(Button)`
+  svg {
+    stroke: hsl(0 100% 36%);
+  }
+
+  &:hover {
+    border-color: hsl(0 100% 84%);
+  }
+`
+
+const AddButton = styled(Button)`
+  svg {
+    stroke: hsl(210 100% 36%);
+  }
+
+  &:hover {
+    border-color: hsl(210 100% 84%);
+  }
+`
 
 export const SubtitleList: FC = () => {
   const [subtitleList, dispatchSubtitleList] = useSubtitleList()
 
-  const [addingHintIndex, setAddingHintIndex] = useState<number>(-1)
-  const [removingHintIndex, setRemovingHintIndex] = useState<number>(-1)
+  const [addingHintByHash, setAddingHintByHash] = useState<number>(-1)
+  const [removingHintByHash, setRemovingHintByHash] = useState<number>(-1)
 
-  const updateStartsAt = (index: number): OnBlurFromTime => event => {
-    dispatchSubtitleList({ type: 'edit::startsAt', index, startsAt: event.target.value })
+  const resizeTextareaHeight = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = `auto` // inducing DOM side-effect for resetting HTMLTextareaElement height
+    textarea.style.height = `${textarea.scrollHeight + 2}px`
   }
 
-  const updateEndsAt = (index: number): OnBlurFromTime => event => {
-    dispatchSubtitleList({ type: 'edit::endsAt', index, endsAt: event.target.value })
+  const updateTextarea = (hash: number, currentTarget: HTMLTextAreaElement) => {
+    dispatchSubtitleList({ type: 'edit::text', hash, text: currentTarget.value })
+    resizeTextareaHeight(currentTarget)
   }
 
-  const onChangeTextarea = (index: number): OnChangeTextarea => ({ currentTarget }) => {
-    currentTarget.style.height = `auto` // inducing DOM side-effect for resetting HTMLTextareaElement height
-    currentTarget.style.height = `${currentTarget.scrollHeight}px`
-
-    dispatchSubtitleList({ type: 'edit::text', index, text: currentTarget.value })
-  }
-
-  const displayHintToRemovingCurrentSubtitle = (index: number) => () => setRemovingHintIndex(index)
-
-  const clearHintToRemovingCurrentSubtitle = () => setRemovingHintIndex(-1)
-
-  const displayHintToAddingNewSubtitle = (index: number) => () => setAddingHintIndex(index)
-
-  const clearHintTOAddingNewSubtitle = () => setAddingHintIndex(-1)
+  const clearHintToRemovingCurrentSubtitle = () => setRemovingHintByHash(Hash.None)
+  const clearHintToAddingNewSubtitle = () => setAddingHintByHash(Hash.None)
 
   return (
     <Layout>
       <Scroll>
-        {subtitleList.map(({ startsAt, endsAt, text }, index) => {
-          const Subtitle =
-            index === removingHintIndex
-              ? RemovingHintedSubtitle
-              : index === addingHintIndex
-              ? AddingHintedSubtitle
-              : UnhintedSubtitle
+        {subtitleList.map(({ timeRange, text, hash }) => {
+          const subtitleClassNames = classnames({
+            AddingHint: hash === addingHintByHash,
+            RemovingHint: hash === removingHintByHash
+          })
+          const textareaClassNames = classnames({
+            RemovingHint: hash === removingHintByHash
+          })
+
           return (
-            <Subtitle key={index}>
+            <Subtitle className={subtitleClassNames} key={hash}>
               <Times>
-                <Time defaultValue={startsAt} onBlur={updateStartsAt(index)} />
-                <Time defaultValue={endsAt} onBlur={updateEndsAt(index)} />
+                <Time>{timeRange.startsAt.toString()}</Time>
+                <Time>{timeRange.endsAt.toString()}</Time>
               </Times>
-              <Textarea defaultValue={text} rows={2} onChange={onChangeTextarea(index)} />
+              <Textarea
+                className={textareaClassNames}
+                defaultValue={text}
+                rows={2}
+                onChange={({ currentTarget }) => updateTextarea(hash, currentTarget)}
+              />
               <Buttons>
                 <RemoveButton
-                  onMouseEnter={displayHintToRemovingCurrentSubtitle(index)}
+                  onMouseEnter={() => setRemovingHintByHash(hash)}
                   onMouseLeave={clearHintToRemovingCurrentSubtitle}
+                  onClick={() => dispatchSubtitleList({ type: 'remove', hash })}
                 >
                   <Cross />
                 </RemoveButton>
                 <AddButton
-                  onMouseEnter={displayHintToAddingNewSubtitle(index)}
-                  onMouseLeave={clearHintTOAddingNewSubtitle}
+                  onMouseEnter={() => setAddingHintByHash(hash)}
+                  onMouseLeave={clearHintToAddingNewSubtitle}
+                  onClick={() => dispatchSubtitleList({ type: 'add', hash })}
                 >
                   <Plus />
                 </AddButton>
