@@ -27,21 +27,21 @@ const Textarea = styled.textarea`
   resize: none;
 
   color: hsl(0 0% 36%);
-  border: 1px solid hsl(0 0% 92%);
+  box-shadow: 0 0 0 1px hsl(0 0% 92%);
 
   &:hover,
   &:focus {
-    border-color: hsl(210 100% 84%);
+    box-shadow: 0 0 0 1px hsl(210 100% 84%);
   }
 
   &:focus.RemovingHint {
-    border-color: hsl(0 0% 84%);
+    box-shadow: 0 0 0 1px hsl(0 0% 84%);
   }
 `
 
 const Subtitle = styled(Grid.Horizontal)`
   grid-gap: 0.5rem;
-  grid-template-columns: min-content 1fr;
+  grid-template-columns: min-content min-content 1fr min-content;
 
   padding: 0.5rem;
 
@@ -68,26 +68,30 @@ const Subtitle = styled(Grid.Horizontal)`
   }
 `
 
+const Index = styled(Div)`
+  width: 4ch;
+
+  padding: 0.5rem 0;
+
+  color: hsl(0 0% 64%);
+`
+
 const Times = styled(Grid.Layout)`
   grid-gap: 0.5rem;
   grid-auto-rows: min-content;
-
-  padding: 0.5rem;
 `
 
 const Time = styled(Div)`
   cursor: pointer;
 
-  width: 10ch;
-
-  padding: 0.25rem;
+  padding: 0.5rem;
 
   color: hsl(0 0% 64%);
 
   &:hover,
   &:focus {
     background-color: white;
-    box-shadow: 0 0 0 1px hsl(210 100% 84%);
+    box-shadow: inset 0 0 0 1px hsl(210 100% 84%);
   }
 `
 
@@ -102,7 +106,7 @@ const Button = styled(Div)`
   width: 2rem;
   height: 2rem;
 
-  padding: 0.5rem;
+  padding: 0.25rem;
 
   border: 1px solid transparent;
 
@@ -153,7 +157,7 @@ export const SubtitleList: FC = () => {
   return (
     <Layout>
       <Scroll>
-        {subtitleList.map(({ timeRange, text, hash }) => {
+        {subtitleList.map(({ timeRange, text, hash }, index) => {
           const subtitleClassNames = classnames({
             AddingHint: hash === addingHintByHash,
             RemovingHint: hash === removingHintByHash
@@ -164,6 +168,7 @@ export const SubtitleList: FC = () => {
 
           return (
             <Subtitle className={subtitleClassNames} key={hash}>
+              <Index>#{index}</Index>
               <Times>
                 <Time>{timeRange.startsAt.toString()}</Time>
                 <Time>{timeRange.endsAt.toString()}</Time>
