@@ -1,6 +1,7 @@
 import { useReducer, Reducer, Dispatch } from 'react'
 import { Subtitle, createSubtitle, createEmptySubtitle } from './Subtitle'
 import { Time } from './Time'
+import { createTimeRange } from './TimeRange'
 
 type State = Subtitle[]
 
@@ -41,10 +42,25 @@ const reducer: Reducer<State, Action> = (state, action) => {
     }
     case 'add': {
       const index = state.findIndex(({ hash }) => hash === action.hash)
-      const currentSubtitle = state[index]
-      const nextSubtitle = createSubtitle(currentSubtitle.timeRange.clone())
-      state.splice(index + 1, 0, nextSubtitle)
-      return [...state]
+      const previousSubtitle = state[index]
+      const nextSubtitle = state[index + 1]
+      const nextStartsAt = previousSubtitle.timeRange.endsAt.clone()
+      const endsAt = nextStartsAt.clone()
+      endsAt.addSeconds(10)
+      // 자막 리스트 끝에 자막 추가
+      if (!nextSubtitle) {
+        const subtitle = createSubtitle(createTimeRange(nextStartsAt, endsAt))
+        return state.concat(subtitle)
+      }
+
+      // 다음 자막의 시작시각이 현재 자막의 종료시각과 같으면 변화 없음
+      if (nextSubtitle.timeRange.startsAt.isEqual(previousSubtitle.timeRange.endsAt)) {
+        return state
+      }
+
+      const nextEndsAt = nextSubtitle.timeRange.startsAt.max(endsAt)
+      const subtitle = createSubtitle(createTimeRange(nextStartsAt, nextEndsAt))
+      return state.splice(index + 1, 0, subtitle)
     }
     case 'remove': {
       return state.length === 1 ? [createEmptySubtitle()] : state.filter(({ hash }) => hash !== action.hash)
@@ -66,4 +82,4 @@ const reducer: Reducer<State, Action> = (state, action) => {
 
 export const useSubtitleList = () => useReducer(reducer, initialState)
 
-const initialState: State = Array.from({ length: 16 }, createEmptySubtitle)
+const initialState: State = [createEmptySubtitle()]
