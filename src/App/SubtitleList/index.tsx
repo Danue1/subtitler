@@ -6,7 +6,6 @@ import { Div } from '../../Atomics/Div'
 import { Grid } from '../../Atomics/Grid'
 import { Plus } from '../../Components/Icons/Plus'
 import { Cross } from '../../Components/Icons/Cross'
-import { Hash } from './Hash'
 
 const Layout = styled(Div)`
   overflow: hidden;
@@ -135,8 +134,8 @@ const AddButton = styled(Button)`
 export const SubtitleList: FC = () => {
   const [subtitleList, dispatchSubtitleList] = useSubtitleList()
 
-  const [addingHintByHash, setAddingHintByHash] = useState<number>(-1)
-  const [removingHintByHash, setRemovingHintByHash] = useState<number>(-1)
+  const [addingHintByHash, setAddingHintByHash] = useState<null | number>(null)
+  const [removingHintByHash, setRemovingHintByHash] = useState<null | number>(null)
 
   const resizeTextareaHeight = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = `auto` // inducing DOM side-effect for resetting HTMLTextareaElement height
@@ -148,8 +147,8 @@ export const SubtitleList: FC = () => {
     resizeTextareaHeight(currentTarget)
   }
 
-  const clearHintToRemovingCurrentSubtitle = () => setRemovingHintByHash(Hash.None)
-  const clearHintToAddingNewSubtitle = () => setAddingHintByHash(Hash.None)
+  const clearHintToRemovingCurrentSubtitle = () => setRemovingHintByHash(null)
+  const clearHintToAddingNewSubtitle = () => setAddingHintByHash(null)
 
   return (
     <Layout>

@@ -1,5 +1,6 @@
 import { useReducer, Reducer, Dispatch } from 'react'
-import { Subtitle } from './Subtitle'
+import { Subtitle, createSubtitle, createEmptySubtitle } from './Subtitle'
+import { Time } from './Time'
 
 type State = Subtitle[]
 
@@ -18,12 +19,12 @@ type Action =
   | {
       readonly type: 'edit::startsAt'
       readonly hash: number
-      readonly startsAt: string
+      readonly startsAt: Time
     }
   | {
       readonly type: 'edit::endsAt'
       readonly hash: number
-      readonly endsAt: string
+      readonly endsAt: Time
     }
   | {
       readonly type: 'edit::text'
@@ -36,17 +37,17 @@ export type SubtitleListDispatch = Dispatch<Action>
 const reducer: Reducer<State, Action> = (state, action) => {
   switch (action.type) {
     case 'reset': {
-      return [Subtitle.createEmpty()]
+      return [createEmptySubtitle()]
     }
     case 'add': {
       const index = state.findIndex(({ hash }) => hash === action.hash)
       const currentSubtitle = state[index]
-      const nextSubtitle = Subtitle.create(currentSubtitle.timeRange.clone(), '')
+      const nextSubtitle = createSubtitle(currentSubtitle.timeRange.clone())
       state.splice(index + 1, 0, nextSubtitle)
       return [...state]
     }
     case 'remove': {
-      return state.length === 1 ? [Subtitle.createEmpty()] : state.filter(({ hash }) => hash !== action.hash)
+      return state.length === 1 ? [createEmptySubtitle()] : state.filter(({ hash }) => hash !== action.hash)
     }
     case 'edit::startsAt': {
       state.find(({ hash }) => hash === action.hash)!.setStartsAt(action.startsAt)
@@ -65,4 +66,4 @@ const reducer: Reducer<State, Action> = (state, action) => {
 
 export const useSubtitleList = () => useReducer(reducer, initialState)
 
-const initialState: State = Array.from({ length: 16 }, Subtitle.createEmpty)
+const initialState: State = Array.from({ length: 16 }, createEmptySubtitle)

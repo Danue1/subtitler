@@ -1,44 +1,51 @@
-import { TimeRange } from './TimeRange'
-import { Hash } from './Hash'
+import { TimeRange, createEmptyTimeRange } from './TimeRange'
+import { createHash, Hash } from './Hash'
+import { Time } from './Time'
 
-export class Subtitle {
-  public static createEmpty() {
-    return Subtitle.create(TimeRange.createEmpty(), '')
-  }
+interface Prototype {
+  readonly setStartsAt: (time: Time) => void
+  readonly setEndsAt: (time: Time) => void
+  readonly setText: (text: string) => void
+  readonly clone: () => Subtitle
+}
 
-  public static create(timeRange: TimeRange, text: string) {
-    return new Subtitle(timeRange, text)
-  }
-
-  private constructor(private _timeRange: TimeRange, private _text: string) {}
-
-  private _hash = Hash.create()
-
-  public get hash() {
-    return this._hash
-  }
-
-  public get text() {
-    return this._text
-  }
-
-  public get timeRange() {
-    return this._timeRange
-  }
-
-  public setText(text: string) {
-    this._text = text
-  }
-
-  public setStartsAt(time: string) {
-    // TODO
-  }
-
-  public setEndsAt(time: string) {
-    // TODO
-  }
-
-  public clone() {
-    return Subtitle.create(this.timeRange.clone(), this._text)
+const prototype: Prototype = {
+  setStartsAt(time) {
+    // TODO(Danuel)
+    const self = this as Subtitle
+  },
+  setEndsAt(time) {
+    // TODO(Danuel)
+    const self = this as Subtitle
+  },
+  setText(text) {
+    // TODO(Danuel)
+    const self = this as Subtitle
+  },
+  clone() {
+    const self = this as Subtitle
+    return createSubtitle(self.timeRange.clone())
   }
 }
+
+export interface Subtitle extends Prototype {
+  text: string
+
+  readonly timeRange: TimeRange
+  readonly hash: Hash
+}
+
+export const createSubtitle = (timeRange: TimeRange): Subtitle =>
+  Object.create(prototype, {
+    timeRange: {
+      value: timeRange
+    },
+    text: {
+      value: ''
+    },
+    hash: {
+      value: createHash()
+    }
+  })
+
+export const createEmptySubtitle = (): Subtitle => createSubtitle(createEmptyTimeRange())

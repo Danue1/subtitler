@@ -1,10 +1,5 @@
-let index = 0
+export type Hash = number
 
-export const Hash = {
-  None: -1,
-  create() {
-    const hash = index
-    index += 1
-    return hash
-  }
-}
+let index: Hash = 0
+
+export const createHash = (): Hash => (index += 1)
