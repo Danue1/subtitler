@@ -8,6 +8,7 @@ import { TimeRange } from '../useSubtitleList/TimeRange'
 import { Buttons } from './Buttons'
 
 const Textarea = styled.textarea`
+  overflow: hidden;
   resize: none;
 
   color: hsl(0 0% 36%);
