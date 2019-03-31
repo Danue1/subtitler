@@ -18,7 +18,7 @@ const Main = styled(Grid.Horizontal)`
   grid-gap: 1rem;
   grid-template-columns: 1fr min-content;
 
-  max-width: 64rem;
+  max-width: var(--max-width);
   width: 100%;
   height: 100%;
 

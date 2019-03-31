@@ -10,6 +10,8 @@ export const Clearfix = createGlobalStyle`
   }
 
   html {
+    --max-width: 80rem;
+
     user-select: none;
     white-space: nowrap;
     overflow-x: auto;

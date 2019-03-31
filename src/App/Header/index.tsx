@@ -18,7 +18,7 @@ const Fixed = styled(Grid.Horizontal)`
 `
 
 const Layout = styled(Grid.Horizontal)`
-  max-width: 64rem;
+  max-width: var(--max-width);
   width: 100%;
 
   margin: 0 auto;
