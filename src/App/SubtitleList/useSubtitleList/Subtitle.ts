@@ -3,24 +3,24 @@ import { createHash, Hash } from './Hash'
 import { Time } from './Time'
 
 interface Prototype {
-  readonly setStartsAt: (time: Time) => void
-  readonly setEndsAt: (time: Time) => void
+  readonly setStartsAt: (startsAt: Time) => void
+  readonly setEndsAt: (endsAt: Time) => void
   readonly setText: (text: string) => void
   readonly clone: () => Subtitle
 }
 
 const prototype: Prototype = {
-  setStartsAt(time) {
-    // TODO(Danuel)
+  setStartsAt(startsAt) {
     const self = this as Subtitle
+    self.timeRange.startsAt = startsAt
   },
-  setEndsAt(time) {
-    // TODO(Danuel)
+  setEndsAt(endsAt) {
     const self = this as Subtitle
+    self.timeRange.startsAt = endsAt
   },
   setText(text) {
-    // TODO(Danuel)
     const self = this as Subtitle
+    self.text = text
   },
   clone() {
     const self = this as Subtitle
@@ -38,9 +38,11 @@ export interface Subtitle extends Prototype {
 export const createSubtitle = (timeRange: TimeRange): Subtitle =>
   Object.create(prototype, {
     timeRange: {
+      writable: true,
       value: timeRange
     },
     text: {
+      writable: true,
       value: ''
     },
     hash: {

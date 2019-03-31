@@ -19,9 +19,11 @@ export interface TimeRange extends Prototype {
 export const createTimeRange = (startsAt: Time, endsAt: Time): TimeRange =>
   Object.create(prototype, {
     startsAt: {
+      writable: true,
       value: startsAt
     },
     endsAt: {
+      writable: true,
       value: endsAt
     }
   })

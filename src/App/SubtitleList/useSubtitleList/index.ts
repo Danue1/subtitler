@@ -60,7 +60,8 @@ const reducer: Reducer<State, Action> = (state, action) => {
 
       const nextEndsAt = nextSubtitle.timeRange.startsAt.max(endsAt)
       const subtitle = createSubtitle(createTimeRange(nextStartsAt, nextEndsAt))
-      return state.splice(index + 1, 0, subtitle)
+      state.splice(index + 1, 0, subtitle)
+      return [...state]
     }
     case 'remove': {
       return state.length === 1 ? [createEmptySubtitle()] : state.filter(({ hash }) => hash !== action.hash)
@@ -80,6 +81,6 @@ const reducer: Reducer<State, Action> = (state, action) => {
   }
 }
 
-export const useSubtitleList = () => useReducer(reducer, initialState)
-
 const initialState: State = [createEmptySubtitle()]
+
+export const useSubtitleList = () => useReducer(reducer, initialState)
