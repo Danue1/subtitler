@@ -6,6 +6,7 @@ import { VideoPlayer } from './VideoPlayer'
 import { Timeline } from './Timeline'
 import { Grid } from '../Atomics/Grid'
 import { Div } from '../Atomics/Div'
+import { AppProvider } from './Context'
 
 const Layout = styled(Div)`
   width: 100vw;
@@ -40,13 +41,15 @@ export const App: FC = () => (
     <Header />
     <Layout>
       <Main as="main">
-        <Left>
-          <SubtitleList />
-        </Left>
-        <Right>
-          <VideoPlayer />
-          <Timeline />
-        </Right>
+        <AppProvider>
+          <Left>
+            <SubtitleList />
+          </Left>
+          <Right>
+            <VideoPlayer />
+            <Timeline />
+          </Right>
+        </AppProvider>
       </Main>
     </Layout>
   </>

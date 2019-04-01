@@ -1,6 +1,7 @@
-interface Prototype {
+import { Clonable } from '../../../types/Clonable'
+
+interface Prototype extends Clonable<TimeAdder> {
   readonly add: (hours: number, minutes: number, seconds: number, milliSeconds: number) => void
-  readonly clone: () => TimeAdder
 }
 
 const prototype: Prototype = {

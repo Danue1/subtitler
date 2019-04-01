@@ -1,6 +1,7 @@
 import { TimeAdder, createTimeAdder } from './TimeAdder'
+import { Clonable } from '../../../types/Clonable'
 
-interface Prototype {
+interface Prototype extends Clonable<Time> {
   readonly hours: number
   readonly minutes: number
   readonly seconds: number
@@ -18,7 +19,6 @@ interface Prototype {
   readonly addSeconds: (seconds: number) => void
   readonly addMilliSeconds: (milliSeconds: number) => void
 
-  readonly clone: () => Time
   readonly toString: () => string
   readonly valueOf: () => string
 }

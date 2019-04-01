@@ -1,7 +1,9 @@
-import { useReducer, Reducer, Dispatch } from 'react'
+import React, { useReducer, Reducer, Dispatch, FC, createContext } from 'react'
 import { Subtitle, createSubtitle, createEmptySubtitle } from './Subtitle'
 import { Time } from './Time'
 import { createTimeRange } from './TimeRange'
+
+type Context = [State, Dispatch<Action>]
 
 type State = Subtitle[]
 
@@ -33,12 +35,12 @@ type Action =
       readonly text: string
     }
 
-export type SubtitleListDispatch = Dispatch<Action>
+const Context = createContext<Context>([{}, {}] as Context)
 
 const reducer: Reducer<State, Action> = (state, action) => {
   switch (action.type) {
     case 'reset': {
-      return [createEmptySubtitle()]
+      return createInitialState()
     }
     case 'add': {
       const index = state.findIndex(({ hash }) => hash === action.hash)
@@ -67,20 +69,27 @@ const reducer: Reducer<State, Action> = (state, action) => {
       return state.length === 1 ? [createEmptySubtitle()] : state.filter(({ hash }) => hash !== action.hash)
     }
     case 'edit::startsAt': {
-      state.find(({ hash }) => hash === action.hash)!.setStartsAt(action.startsAt)
+      state.find(({ hash }) => hash === action.hash)!.timeRange.startsAt = action.startsAt
       return [...state]
     }
     case 'edit::endsAt': {
-      state.find(({ hash }) => hash === action.hash)!.setEndsAt(action.endsAt)
+      state.find(({ hash }) => hash === action.hash)!.timeRange.endsAt = action.endsAt
       return [...state]
     }
     case 'edit::text': {
-      state.find(({ hash }) => hash === action.hash)!.setText(action.text)
+      state.find(({ hash }) => hash === action.hash)!.text = action.text
       return [...state]
     }
   }
 }
 
-const initialState: State = [createEmptySubtitle()]
+const createInitialState = (): State => [createEmptySubtitle()]
+
+const initialState: State = createInitialState()
 
 export const useSubtitleList = () => useReducer(reducer, initialState)
+
+export const SubtitleListProvider: FC = ({ children }) => {
+  const context: Context = useReducer(reducer, initialState)
+  return <Context.Provider value={context}> {children}</Context.Provider>
+}

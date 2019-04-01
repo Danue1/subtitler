@@ -1,8 +1,7 @@
 import { Time, createEmptyTime } from './Time'
+import { Clonable } from '../../../types/Clonable'
 
-interface Prototype {
-  readonly clone: () => TimeRange
-}
+type Prototype = Clonable<TimeRange>
 
 const prototype: Prototype = {
   clone() {

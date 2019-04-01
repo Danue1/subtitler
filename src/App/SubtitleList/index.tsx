@@ -1,8 +1,11 @@
 import React, { FC } from 'react'
 import styled from 'styled-components'
-import { useSubtitleList } from './useSubtitleList'
 import { Div } from '../../Atomics/Div'
 import { Subtitle } from './Subtitle'
+import { useSubtitleList } from '../Context/SubtitleList'
+import { Modal } from '../../Components/Modal'
+import { TimeEditor } from './TimeEditor'
+import { useCurrentSubtitle } from '../Context/CurrentSubtitle'
 
 const Layout = styled(Div)`
   overflow: hidden;
@@ -21,22 +24,19 @@ const Scroll = styled(Div)`
 `
 
 export const SubtitleList: FC = () => {
-  const [subtitleList, dispatchSubtitleList] = useSubtitleList()
+  const [subtitleList] = useSubtitleList()
+  const [{ kind }] = useCurrentSubtitle()
 
   return (
     <Layout>
       <Scroll>
-        {subtitleList.map(({ timeRange, text, hash }, index) => (
-          <Subtitle
-            key={hash}
-            index={index}
-            timeRange={timeRange}
-            text={text}
-            hash={hash}
-            dispatch={dispatchSubtitleList}
-          />
+        {subtitleList.map((subtitle, index) => (
+          <Subtitle key={subtitle.hash} index={index} subtitle={subtitle} />
         ))}
       </Scroll>
+      <Modal isOpen={kind === 'editing::startsAt' || kind === 'editing::endsAt'}>
+        <TimeEditor />
+      </Modal>
     </Layout>
   )
 }

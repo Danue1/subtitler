@@ -4,8 +4,8 @@ import { Grid } from '../../../../Atomics/Grid'
 import { Div } from '../../../../Atomics/Div'
 import { Plus } from '../../../../Components/Icons/Plus'
 import { Cross } from '../../../../Components/Icons/Cross'
-import { SubtitleListDispatch } from '../../useSubtitleList'
-import { Hash } from '../../useSubtitleList/Hash'
+import { useSubtitleList } from '../../../Context/SubtitleList'
+import { Hash } from '../../../Context/SubtitleList/Hash'
 
 const Layout = styled(Grid.Horizontal)`
   cursor: pointer;
@@ -51,10 +51,11 @@ interface Props {
   readonly hash: Hash
   readonly layoutRef: RefObject<HTMLDivElement>
   readonly textareaRef: RefObject<HTMLTextAreaElement>
-  readonly dispatch: SubtitleListDispatch
 }
 
-const ButtonsComponent: FC<Props> = ({ hash, layoutRef, textareaRef, dispatch }) => {
+const ButtonsComponent: FC<Props> = ({ hash, layoutRef, textareaRef }) => {
+  const [, dispatchSubtitleList] = useSubtitleList()
+
   const addAddingHint = () => {
     layoutRef.current!.classList.add('AddingHint')
   }
@@ -78,14 +79,14 @@ const ButtonsComponent: FC<Props> = ({ hash, layoutRef, textareaRef, dispatch })
       <AddButton
         onMouseEnter={addAddingHint}
         onMouseLeave={removeAddingHint}
-        onClick={() => dispatch({ type: 'add', hash })}
+        onClick={() => dispatchSubtitleList({ type: 'add', hash })}
       >
         <Plus />
       </AddButton>
       <RemoveButton
         onMouseEnter={addRemovingHint}
         onMouseLeave={removeRemovingHint}
-        onClick={() => dispatch({ type: 'remove', hash })}
+        onClick={() => dispatchSubtitleList({ type: 'remove', hash })}
       >
         <Cross />
       </RemoveButton>
