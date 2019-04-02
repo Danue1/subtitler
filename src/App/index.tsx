@@ -17,7 +17,10 @@ const Layout = styled(Div)`
 
 const Main = styled(Grid.Horizontal)`
   grid-gap: 1rem;
-  grid-template-columns: 1fr min-content;
+  grid-template:
+    'SubtitleList VideoPlayer' 18rem
+    'Timeline Timeline' 1fr
+    / 1fr min-content;
 
   max-width: var(--max-width);
   width: 100%;
@@ -30,10 +33,16 @@ const Main = styled(Grid.Horizontal)`
   box-shadow: 0 0 0 1px hsl(0 0% 84%);
 `
 
-const Left = Div
+const SubtitleListItem = styled(Div)`
+  grid-area: SubtitleList;
+`
 
-const Right = styled(Grid.Vertical)`
-  grid-template-rows: min-content 1fr;
+const VideoPlayerItem = styled(Div)`
+  grid-area: VideoPlayer;
+`
+
+const TimelineItem = styled(Div)`
+  grid-area: Timeline;
 `
 
 export const App: FC = () => (
@@ -42,13 +51,15 @@ export const App: FC = () => (
     <Layout>
       <Main as="main">
         <AppProvider>
-          <Left>
+          <SubtitleListItem>
             <SubtitleList />
-          </Left>
-          <Right>
+          </SubtitleListItem>
+          <VideoPlayerItem>
             <VideoPlayer />
+          </VideoPlayerItem>
+          <TimelineItem>
             <Timeline />
-          </Right>
+          </TimelineItem>
         </AppProvider>
       </Main>
     </Layout>

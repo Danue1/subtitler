@@ -10,7 +10,7 @@ import { Hash } from '../../../Context/SubtitleList/Hash'
 const Layout = styled(Grid.Horizontal)`
   cursor: pointer;
 
-  grid-gap: 0.5rem;
+  grid-gap: 0.25rem;
   align-content: space-between;
 `
 

@@ -10,9 +10,10 @@ import { useCurrentSubtitle } from '../../../../Context/CurrentSubtitle'
 import { Subtitle } from '../../../../Context/SubtitleList/Subtitle'
 
 const Layout = styled(Grid.Horizontal)`
-  grid-gap: 0.25rem;
   align-items: center;
   grid-template-columns: repeat(3, min-content 0.5rem) min-content;
+
+  height: 100%;
 
   &:hover,
   &.Focused {

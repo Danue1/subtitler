@@ -4,8 +4,9 @@ import { Div } from '../../Atomics/Div'
 import { Subtitle } from './Subtitle'
 import { useSubtitleList } from '../Context/SubtitleList'
 import { useCurrentSubtitle } from '../Context/CurrentSubtitle'
+import { Grid } from '../../Atomics/Grid'
 
-const Layout = styled(Div)`
+const Layout = styled(Grid.Horizontal)`
   overflow: hidden;
 
   border-radius: 0.25rem;
@@ -18,7 +19,7 @@ const Layout = styled(Div)`
 const Scroll = styled(Div)`
   overflow: hidden scroll;
 
-  height: calc(100vh - 5rem);
+  height: 18rem;
 `
 
 export const SubtitleList: FC = () => {

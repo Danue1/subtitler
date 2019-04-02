@@ -14,15 +14,15 @@ const Textarea = styled.textarea`
   resize: none;
 
   color: hsl(0 0% 36%);
-  border: 1px solid hsl(0 0% 92%);
+  box-shadow: 0 0 0 1px hsl(0 0% 92%);
 
   &:hover,
   &:focus {
-    border-color: hsl(210 100% 84%);
+    box-shadow: 0 0 0 1px hsl(210 100% 84%);
   }
 
   &:focus.RemovingHint {
-    border-color: hsl(0 0% 84%);
+    box-shadow: 0 0 0 1px hsl(0 0% 84%);
   }
 `
 
@@ -30,7 +30,7 @@ const Layout = styled(Grid.Horizontal)`
   grid-gap: 0.5rem;
   grid-template-columns: min-content min-content 1fr min-content;
 
-  padding: 0.5rem;
+  padding: 0.25rem;
   padding-left: 1rem;
 
   border-bottom: 2px solid transparent;

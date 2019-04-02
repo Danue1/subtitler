@@ -33,6 +33,8 @@ export type EditingKind = 'edit::startsAt' | 'edit::endsAt'
 
 const Context = createContext<Context>([{}, {}] as Context)
 
+const maximumTime = Time.create(23, 59, 59, 999, false, false)
+
 const reducer: Reducer<State, Action> = (state, action) => {
   switch (action.type) {
     case 'reset': {
@@ -40,13 +42,19 @@ const reducer: Reducer<State, Action> = (state, action) => {
     }
     case 'add': {
       const index = state.findIndex(({ hash }) => hash === action.hash)
-      const previousSubtitle = state[index]
+      const currentSubtitle = state[index]
       const nextSubtitle = state[index + 1]
-      const nextStartsAt = previousSubtitle.timeRange.endsAt.clone()
+      const nextStartsAt = currentSubtitle.timeRange.endsAt.clone()
       const endsAt = nextStartsAt.clone()
       nextStartsAt.setStart(true)
       endsAt.setEnd(true)
       endsAt.addSeconds(10)
+
+      // 현재 자막의 종료시각이 '24시간 - 1'이면 변화 없음
+      if (maximumTime.isEquals(nextStartsAt)) {
+        return state
+      }
+
       // 자막 리스트 끝에 자막 추가
       if (!nextSubtitle) {
         const subtitle = Subtitle.create(TimeRange.create(nextStartsAt, endsAt))
@@ -54,7 +62,7 @@ const reducer: Reducer<State, Action> = (state, action) => {
       }
 
       // 다음 자막의 시작시각이 현재 자막의 종료시각과 같으면 변화 없음
-      if (nextSubtitle.timeRange.startsAt.isEquals(previousSubtitle.timeRange.endsAt)) {
+      if (nextSubtitle.timeRange.startsAt.isEquals(currentSubtitle.timeRange.endsAt)) {
         return state
       }
 

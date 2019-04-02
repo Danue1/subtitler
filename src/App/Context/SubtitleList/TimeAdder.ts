@@ -76,8 +76,9 @@ export class TimeAdder implements Clonable<TimeAdder> {
   private reCache() {
     const timestamp = date.getTime()
     if (timestamp < 0) {
-      date.setTime(0)
-      this._timestamp = 0
+      date.setTime((this._timestamp = 0))
+    } else if (timestamp >= oneDay) {
+      date.setTime((this._timestamp = oneDay - 1))
     } else {
       this._timestamp = timestamp
     }

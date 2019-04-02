@@ -1,4 +1,4 @@
-import React, { FC, memo, ChangeEventHandler, KeyboardEventHandler } from 'react'
+import React, { FC, ChangeEventHandler, KeyboardEventHandler } from 'react'
 import styled from 'styled-components'
 import { Subtitle } from '../../../Context/SubtitleList/Subtitle'
 import { Grid } from '../../../../Atomics/Grid'
@@ -8,7 +8,6 @@ import { Tilde } from '../../../../Components/Icons/Tilde'
 import { Time } from './Time'
 
 const Layout = styled(Grid.Horizontal)`
-  grid-gap: 0.5rem;
   align-items: center;
   grid-template-columns: min-content 1.5rem min-content;
 
