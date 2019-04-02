@@ -77,6 +77,7 @@ const ButtonsComponent: FC<Props> = ({ hash, layoutRef, textareaRef }) => {
   return (
     <Layout>
       <AddButton
+        role="button"
         onMouseEnter={addAddingHint}
         onMouseLeave={removeAddingHint}
         onClick={() => dispatchSubtitleList({ type: 'add', hash })}
@@ -84,6 +85,7 @@ const ButtonsComponent: FC<Props> = ({ hash, layoutRef, textareaRef }) => {
         <Plus />
       </AddButton>
       <RemoveButton
+        role="button"
         onMouseEnter={addRemovingHint}
         onMouseLeave={removeRemovingHint}
         onClick={() => dispatchSubtitleList({ type: 'remove', hash })}

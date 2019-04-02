@@ -30,6 +30,9 @@ export class Time implements Clonable<Time> {
     this.adder = TimeAdder.create(hours, minutes, seconds, milliSeconds)
   }
 
+  public get time() {
+    return this.adder.timestamp
+  }
   public get hours() {
     return this.adder.hours
   }
@@ -44,13 +47,13 @@ export class Time implements Clonable<Time> {
   }
 
   public isEqual(time: Time) {
-    return time.valueOf() === this.valueOf()
+    return time.adder.timestamp === this.adder.timestamp
   }
   public isLower(time: Time) {
-    return time.valueOf() < this.valueOf()
+    return time.adder.timestamp < this.adder.timestamp
   }
   public isHigher(time: Time) {
-    return time.valueOf() > this.valueOf()
+    return time.adder.timestamp > this.adder.timestamp
   }
 
   min(time: Time) {
@@ -95,13 +98,5 @@ export class Time implements Clonable<Time> {
     const seconds = this.seconds.toString().padStart(2, '0')
     const milliSeconds = this.milliSeconds.toString().padStart(3, '0')
     return `${hours}:${minutes}:${seconds}.${milliSeconds}`
-  }
-
-  valueOf() {
-    const hours = this.hours.toString().padStart(2, '0')
-    const minutes = this.minutes.toString().padStart(2, '0')
-    const seconds = this.seconds.toString().padStart(2, '0')
-    const milliSeconds = this.milliSeconds.toString().padStart(3, '0')
-    return hours + minutes + seconds + milliSeconds
   }
 }

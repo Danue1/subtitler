@@ -21,7 +21,7 @@ export class TimeAdder implements Clonable<TimeAdder> {
     return new TimeAdder(0, 0, 0, 0)
   }
 
-  private _time = 0
+  private _timestamp = 0
   private _hours = 0
   private _minutes = 0
   private _seconds = 0
@@ -31,6 +31,9 @@ export class TimeAdder implements Clonable<TimeAdder> {
     this.add(hours, minutes, seconds, milliSeconds)
   }
 
+  public get timestamp() {
+    return this._timestamp
+  }
   public get hours() {
     return this._hours
   }
@@ -65,16 +68,20 @@ export class TimeAdder implements Clonable<TimeAdder> {
   }
 
   private prepare(handler: (date: Date) => void) {
-    date.setTime(this._time)
+    date.setTime(this._timestamp)
     handler(date)
     this.reCache()
   }
 
   private reCache() {
-    const time = (oneDay + date.getTime()) % oneDay
-    date.setTime(time)
+    const timestamp = date.getTime()
+    if (timestamp < 0) {
+      date.setTime(0)
+      this._timestamp = 0
+    } else {
+      this._timestamp = timestamp
+    }
 
-    this._time = time
     this._hours = date.getUTCHours()
     this._minutes = date.getUTCMinutes()
     this._seconds = date.getUTCSeconds()

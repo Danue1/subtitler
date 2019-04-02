@@ -1,13 +1,13 @@
-import React, { FC, memo, useRef, ChangeEventHandler, MouseEventHandler } from 'react'
+import React, { FC, memo, useRef, ChangeEventHandler, EventHandler, SyntheticEvent } from 'react'
 import classNames from 'classnames'
 import styled from 'styled-components'
 import { Grid } from '../../../Atomics/Grid'
-import { Div } from '../../../Atomics/Div'
 import { Buttons } from './Buttons'
 import { useSubtitleList } from '../../Context/SubtitleList'
 import { Subtitle as ISubtitle } from '../../Context/SubtitleList/Subtitle'
 import { Times } from './Times'
 import { useCurrentSubtitle } from '../../Context/CurrentSubtitle'
+import { HashTag } from '../../../Components/Icons/HashTag'
 
 const Textarea = styled.textarea`
   overflow: hidden;
@@ -57,10 +57,11 @@ const Layout = styled(Grid.Horizontal)`
   }
 `
 
-const Index = styled(Div)`
-  width: 5ch;
+const Index = styled(Grid.Horizontal)`
+  align-items: center;
+  grid-template-columns: 1.5rem 5ch;
 
-  padding: 0.75rem 0;
+  height: 2.5rem;
 
   color: hsl(0 0% 64%);
 `
@@ -86,7 +87,7 @@ const SubtitleComponent: FC<Props> = ({ index, subtitle }) => {
     Selected: subtitle.hash === currentSubtitle.hash
   })
 
-  const selectCurrentSubtitle: MouseEventHandler<HTMLDivElement> = event => {
+  const selectCurrentSubtitle: EventHandler<SyntheticEvent<Element>> = event => {
     event.stopPropagation()
     dispatchCurrentSubtitle({ type: 'select', subtitle })
   }
@@ -98,9 +99,18 @@ const SubtitleComponent: FC<Props> = ({ index, subtitle }) => {
 
   return (
     <Layout ref={layoutRef} className={layoutClassName} onClick={selectCurrentSubtitle}>
-      <Index>#{index}</Index>
+      <Index>
+        <HashTag />
+        <span>{index + 1}</span>
+      </Index>
       <Times index={index} subtitle={subtitle} />
-      <Textarea ref={textareaRef} rows={1} defaultValue={subtitle.text} onChange={updateTextarea} />
+      <Textarea
+        ref={textareaRef}
+        rows={1}
+        defaultValue={subtitle.text}
+        onFocus={selectCurrentSubtitle}
+        onChange={updateTextarea}
+      />
       <Buttons hash={subtitle.hash} layoutRef={layoutRef} textareaRef={textareaRef} />
     </Layout>
   )

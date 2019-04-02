@@ -23,9 +23,7 @@ const emptyTime = ITime.createEmpty(false, false)
 
 enum Arrows {
   ArrowUp = 100,
-  ArrowRight = 100,
-  ArrowDown = -100,
-  ArrowLeft = -100
+  ArrowDown = -100
 }
 
 interface Props {
@@ -33,7 +31,7 @@ interface Props {
   readonly subtitle: Subtitle
 }
 
-const TimesComponent: FC<Props> = ({ subtitle }) => {
+const TimesComponent: FC<Props> = ({ index, subtitle }) => {
   const [subtitleList, dispatchSubtitleList] = useSubtitleList()
 
   const { timeRange, hash } = subtitle
@@ -41,7 +39,7 @@ const TimesComponent: FC<Props> = ({ subtitle }) => {
 
   const updateTime = (timeKind: TimeKind, time: ITime): ChangeEventHandler<HTMLInputElement> => event => {
     const value = Number.parseInt(event.currentTarget.value || '0')
-    if (Number.isNaN(value)) {
+    if (Number.isNaN(value) || value < 0) {
       return
     }
 
@@ -49,26 +47,24 @@ const TimesComponent: FC<Props> = ({ subtitle }) => {
     const timeInfo = { hours, minutes, seconds, milliSeconds }
     timeInfo[timeKind] = value
     const cachedTime = ITime.create(
-      timeInfo.hours,
-      timeInfo.minutes,
-      timeInfo.seconds,
-      timeInfo.milliSeconds,
+      Math.abs(Math.min(timeInfo.hours, 23)),
+      Math.abs(Math.min(timeInfo.minutes, 59)),
+      Math.abs(Math.min(timeInfo.seconds, 59)),
+      Math.abs(Math.min(timeInfo.milliSeconds, 999)),
       false,
       false
     )
 
-    const currentSubtitleIndex = subtitleList.findIndex(subtitle => subtitle.hash === hash)
-
     if (time.isStart) {
-      const previousSubtitle = subtitleList[currentSubtitleIndex - 1]
-      const endsAtOfPreviousTime = previousSubtitle ? previousSubtitle.timeRange.endsAt : emptyTime
-      const nextTime = endsAt.min(endsAtOfPreviousTime.max(cachedTime))
+      const previousSubtitle = subtitleList[index - 1]
+      const endsAtOfPreviousSubtitle = previousSubtitle ? previousSubtitle.timeRange.endsAt : emptyTime
+      const nextTime = endsAt.min(endsAtOfPreviousSubtitle.max(cachedTime))
       nextTime.setStart(true)
       return dispatchSubtitleList({ type: 'edit::startsAt', hash, nextTime })
     }
 
     if (time.isEnd) {
-      const startsAtOfNextSubtitle = subtitleList[currentSubtitleIndex + 1]
+      const startsAtOfNextSubtitle = subtitleList[index + 1]
       const nextTime = startsAtOfNextSubtitle
         ? startsAtOfNextSubtitle.timeRange.startsAt.min(startsAt.max(cachedTime))
         : startsAt.max(cachedTime)
@@ -77,16 +73,17 @@ const TimesComponent: FC<Props> = ({ subtitle }) => {
     }
   }
 
-  const updateTimeByArrow = (kind: TimeKind, time: ITime): KeyboardEventHandler<HTMLInputElement> => event => {
+  const updateTimeByArrow = (timeKind: TimeKind, time: ITime): KeyboardEventHandler<HTMLInputElement> => event => {
     if (!Arrows.hasOwnProperty(event.key)) {
       return
     }
 
     event.preventDefault()
+
     const { hours, minutes, seconds, milliSeconds } = time
     const timeInfo = { hours, minutes, seconds, milliSeconds }
-    timeInfo[kind] += 1 * Math.sign((Arrows[event.key as any] as any) as number)
-    const nextTime = ITime.create(
+    timeInfo[timeKind] += 1 * Math.sign((Arrows[event.key as any] as any) as number)
+    const cachedTime = ITime.create(
       timeInfo.hours,
       timeInfo.minutes,
       timeInfo.seconds,
@@ -94,18 +91,34 @@ const TimesComponent: FC<Props> = ({ subtitle }) => {
       time.isStart,
       time.isEnd
     )
-    dispatchSubtitleList({ type: nextTime.isStart ? 'edit::startsAt' : 'edit::endsAt', nextTime, hash })
+
+    if (cachedTime.isStart) {
+      const previousSubtitle = subtitleList[index - 1]
+      const endsAtOfPreviousSubtitle = previousSubtitle ? previousSubtitle.timeRange.endsAt : emptyTime
+      const nextTime = endsAt.min(endsAtOfPreviousSubtitle.max(cachedTime))
+      nextTime.setStart(true)
+      return dispatchSubtitleList({ type: 'edit::startsAt', hash, nextTime })
+    }
+
+    if (cachedTime.isEnd) {
+      const startsAtOfNextSubtitle = subtitleList[index + 1]
+      const nextTime = startsAtOfNextSubtitle
+        ? startsAtOfNextSubtitle.timeRange.startsAt.min(startsAt.max(cachedTime))
+        : startsAt.max(cachedTime)
+      nextTime.setEnd(true)
+      return dispatchSubtitleList({ type: 'edit::endsAt', hash, nextTime })
+    }
   }
 
   return (
     <Layout>
-      <Time time={startsAt} onKeyDown={updateTimeByArrow} onChange={updateTime} />
+      <Time subtitle={subtitle} time={startsAt} onKeyDown={updateTimeByArrow} onChange={updateTime} />
 
       <Spacer>
         <Tilde />
       </Spacer>
 
-      <Time time={endsAt} onKeyDown={updateTimeByArrow} onChange={updateTime} />
+      <Time subtitle={subtitle} time={endsAt} onKeyDown={updateTimeByArrow} onChange={updateTime} />
     </Layout>
   )
 }

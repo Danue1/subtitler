@@ -1,13 +1,18 @@
 import React, { FC, ChangeEventHandler, KeyboardEventHandler, memo, useState } from 'react'
 import classNames from 'classnames'
 import styled from 'styled-components'
+import { Colon } from '../../../../../Components/Icons/Colon'
+import { Dot } from '../../../../../Components/Icons/Dot'
 import { Grid } from '../../../../../Atomics/Grid'
 import { Time as ITime } from '../../../../Context/SubtitleList/Time'
 import { TimeKind } from '../../../../Context/SubtitleList'
+import { useCurrentSubtitle } from '../../../../Context/CurrentSubtitle'
+import { Subtitle } from '../../../../Context/SubtitleList/Subtitle'
 
 const Layout = styled(Grid.Horizontal)`
   grid-gap: 0.25rem;
   align-items: center;
+  grid-template-columns: repeat(3, min-content 0.5rem) min-content;
 
   &:hover,
   &.Focused {
@@ -18,7 +23,7 @@ const Layout = styled(Grid.Horizontal)`
 const TimeValue = styled.input`
   padding: 0.25rem 0;
 
-  text-align: end;
+  text-align: center;
 
   &:hover,
   &:focus {
@@ -52,15 +57,24 @@ enum Focus {
 }
 
 interface Props {
+  readonly subtitle: Subtitle
   readonly time: ITime
   readonly onKeyDown: (timeKind: TimeKind, time: ITime) => KeyboardEventHandler<HTMLInputElement>
   readonly onChange: (timeKind: TimeKind, time: ITime) => ChangeEventHandler<HTMLInputElement>
 }
 
-const TimeComponent: FC<Props> = ({ time, onKeyDown, onChange }) => {
+const TimeComponent: FC<Props> = ({ subtitle, time, onKeyDown, onChange }) => {
   const [focus, setFocus] = useState<Focus>(Focus.None)
+  const [, dispatchCurrentSubtitle] = useCurrentSubtitle()
 
-  const setFocusOut = () => setFocus(Focus.None)
+  const updateFocus = (focus: Focus) => {
+    setFocus(focus)
+    dispatchCurrentSubtitle({ type: 'select', subtitle })
+  }
+
+  const setFocusOut = () => {
+    setFocus(Focus.None)
+  }
 
   const layoutClassName = classNames({
     Focused: focus !== Focus.None
@@ -72,37 +86,43 @@ const TimeComponent: FC<Props> = ({ time, onKeyDown, onChange }) => {
         value={time.hours}
         onChange={onChange('hours', time)}
         onKeyDown={onKeyDown('hours', time)}
-        onFocus={() => setFocus(Focus.Hours)}
+        onFocus={() => updateFocus(Focus.Hours)}
         onBlur={setFocusOut}
         min={0}
         max={23}
       />
-      <span>:</span>
+
+      <Colon />
+
       <Minute
         value={time.minutes}
         onChange={onChange('minutes', time)}
         onKeyDown={onKeyDown('minutes', time)}
-        onFocus={() => setFocus(Focus.Minutes)}
+        onFocus={() => updateFocus(Focus.Minutes)}
         onBlur={setFocusOut}
         min={0}
         max={59}
       />
-      <span>:</span>
+
+      <Colon />
+
       <Second
         value={time.seconds}
         onChange={onChange('seconds', time)}
         onKeyDown={onKeyDown('seconds', time)}
-        onFocus={() => setFocus(Focus.Seconds)}
+        onFocus={() => updateFocus(Focus.Seconds)}
         onBlur={setFocusOut}
         min={0}
         max={59}
       />
-      <span>.</span>
+
+      <Dot />
+
       <MilliSecond
         value={time.milliSeconds}
         onChange={onChange('milliSeconds', time)}
         onKeyDown={onKeyDown('milliSeconds', time)}
-        onFocus={() => setFocus(Focus.MilliSeconds)}
+        onFocus={() => updateFocus(Focus.MilliSeconds)}
         onBlur={setFocusOut}
         min={0}
         max={999}

@@ -13,11 +13,7 @@ type Action =
       readonly type: 'reset'
     }
   | {
-      readonly type: 'add'
-      readonly hash: number
-    }
-  | {
-      readonly type: 'remove'
+      readonly type: 'add' | 'remove'
       readonly hash: number
     }
   | {
@@ -48,6 +44,8 @@ const reducer: Reducer<State, Action> = (state, action) => {
       const nextSubtitle = state[index + 1]
       const nextStartsAt = previousSubtitle.timeRange.endsAt.clone()
       const endsAt = nextStartsAt.clone()
+      nextStartsAt.setStart(true)
+      endsAt.setEnd(true)
       endsAt.addSeconds(10)
       // 자막 리스트 끝에 자막 추가
       if (!nextSubtitle) {
@@ -83,7 +81,11 @@ const reducer: Reducer<State, Action> = (state, action) => {
   }
 }
 
-const createInitialState = (): State => [Subtitle.createEmpty()]
+const createInitialState = (): State => {
+  const subtitle = Subtitle.createEmpty()
+  subtitle.timeRange.endsAt.addSeconds(10)
+  return [subtitle]
+}
 
 const initialState: State = createInitialState()
 
