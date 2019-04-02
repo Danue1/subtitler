@@ -58,7 +58,7 @@ const reducer: Reducer<State, Action> = (state, action) => {
         return state
       }
 
-      const nextEndsAt = nextSubtitle.timeRange.startsAt.max(endsAt)
+      const nextEndsAt = nextSubtitle.timeRange.startsAt.min(endsAt)
       const subtitle = Subtitle.create(TimeRange.create(nextStartsAt, nextEndsAt))
       state.splice(index + 1, 0, subtitle)
       return [...state]
