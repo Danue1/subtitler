@@ -63,7 +63,7 @@ interface Props {
   readonly onChange: (timeKind: TimeKind, time: ITime) => ChangeEventHandler<HTMLInputElement>
 }
 
-const TimeComponent: FC<Props> = ({ subtitle, time, onKeyDown, onChange }) => {
+export const Time: FC<Props> = ({ subtitle, time, onKeyDown, onChange }) => {
   const [focus, setFocus] = useState<Focus>(Focus.None)
   const [, dispatchCurrentSubtitle] = useCurrentSubtitle()
 
@@ -130,5 +130,3 @@ const TimeComponent: FC<Props> = ({ subtitle, time, onKeyDown, onChange }) => {
     </Layout>
   )
 }
-
-export const Time = memo(TimeComponent, (previous, next) => previous.time === next.time)

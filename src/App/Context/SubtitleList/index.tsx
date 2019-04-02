@@ -54,11 +54,12 @@ const reducer: Reducer<State, Action> = (state, action) => {
       }
 
       // 다음 자막의 시작시각이 현재 자막의 종료시각과 같으면 변화 없음
-      if (nextSubtitle.timeRange.startsAt.isEqual(previousSubtitle.timeRange.endsAt)) {
+      if (nextSubtitle.timeRange.startsAt.isEquals(previousSubtitle.timeRange.endsAt)) {
         return state
       }
 
       const nextEndsAt = nextSubtitle.timeRange.startsAt.min(endsAt)
+      nextEndsAt.setEnd(true)
       const subtitle = Subtitle.create(TimeRange.create(nextStartsAt, nextEndsAt))
       state.splice(index + 1, 0, subtitle)
       return [...state]

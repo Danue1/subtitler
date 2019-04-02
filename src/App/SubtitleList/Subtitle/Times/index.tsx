@@ -4,19 +4,15 @@ import { Subtitle } from '../../../Context/SubtitleList/Subtitle'
 import { Grid } from '../../../../Atomics/Grid'
 import { useSubtitleList, TimeKind } from '../../../Context/SubtitleList'
 import { Time as ITime } from '../../../Context/SubtitleList/Time'
-import { Div } from '../../../../Atomics/Div'
 import { Tilde } from '../../../../Components/Icons/Tilde'
 import { Time } from './Time'
 
 const Layout = styled(Grid.Horizontal)`
   grid-gap: 0.5rem;
   align-items: center;
+  grid-template-columns: min-content 1.5rem min-content;
 
   color: hsl(0 0% 64%);
-`
-
-const Spacer = styled(Div)`
-  width: 1.5rem;
 `
 
 const emptyTime = ITime.createEmpty(false, false)
@@ -31,7 +27,7 @@ interface Props {
   readonly subtitle: Subtitle
 }
 
-const TimesComponent: FC<Props> = ({ index, subtitle }) => {
+export const Times: FC<Props> = ({ index, subtitle }) => {
   const [subtitleList, dispatchSubtitleList] = useSubtitleList()
 
   const { timeRange, hash } = subtitle
@@ -58,16 +54,20 @@ const TimesComponent: FC<Props> = ({ index, subtitle }) => {
     if (time.isStart) {
       const previousSubtitle = subtitleList[index - 1]
       const endsAtOfPreviousSubtitle = previousSubtitle ? previousSubtitle.timeRange.endsAt : emptyTime
-      const nextTime = endsAt.min(endsAtOfPreviousSubtitle.max(cachedTime))
+      const currentEndsAt = endsAt.clone()
+      currentEndsAt.addMilliSeconds(-1)
+      const nextTime = currentEndsAt.min(endsAtOfPreviousSubtitle.max(cachedTime))
       nextTime.setStart(true)
       return dispatchSubtitleList({ type: 'edit::startsAt', hash, nextTime })
     }
 
     if (time.isEnd) {
       const startsAtOfNextSubtitle = subtitleList[index + 1]
+      const currentStartsAt = startsAt.clone()
+      currentStartsAt.addMilliSeconds(1)
       const nextTime = startsAtOfNextSubtitle
-        ? startsAtOfNextSubtitle.timeRange.startsAt.min(startsAt.max(cachedTime))
-        : startsAt.max(cachedTime)
+        ? startsAtOfNextSubtitle.timeRange.startsAt.min(currentStartsAt.max(cachedTime))
+        : currentStartsAt.max(cachedTime)
       nextTime.setEnd(true)
       return dispatchSubtitleList({ type: 'edit::endsAt', hash, nextTime })
     }
@@ -95,16 +95,20 @@ const TimesComponent: FC<Props> = ({ index, subtitle }) => {
     if (cachedTime.isStart) {
       const previousSubtitle = subtitleList[index - 1]
       const endsAtOfPreviousSubtitle = previousSubtitle ? previousSubtitle.timeRange.endsAt : emptyTime
-      const nextTime = endsAt.min(endsAtOfPreviousSubtitle.max(cachedTime))
+      const currentEndsAt = endsAt.clone()
+      currentEndsAt.addMilliSeconds(-1)
+      const nextTime = currentEndsAt.min(endsAtOfPreviousSubtitle.max(cachedTime))
       nextTime.setStart(true)
       return dispatchSubtitleList({ type: 'edit::startsAt', hash, nextTime })
     }
 
     if (cachedTime.isEnd) {
       const startsAtOfNextSubtitle = subtitleList[index + 1]
+      const currentStartsAt = startsAt.clone()
+      currentStartsAt.addMilliSeconds(1)
       const nextTime = startsAtOfNextSubtitle
-        ? startsAtOfNextSubtitle.timeRange.startsAt.min(startsAt.max(cachedTime))
-        : startsAt.max(cachedTime)
+        ? startsAtOfNextSubtitle.timeRange.startsAt.min(currentStartsAt.max(cachedTime))
+        : currentStartsAt.max(cachedTime)
       nextTime.setEnd(true)
       return dispatchSubtitleList({ type: 'edit::endsAt', hash, nextTime })
     }
@@ -113,14 +117,8 @@ const TimesComponent: FC<Props> = ({ index, subtitle }) => {
   return (
     <Layout>
       <Time subtitle={subtitle} time={startsAt} onKeyDown={updateTimeByArrow} onChange={updateTime} />
-
-      <Spacer>
-        <Tilde />
-      </Spacer>
-
+      <Tilde />
       <Time subtitle={subtitle} time={endsAt} onKeyDown={updateTimeByArrow} onChange={updateTime} />
     </Layout>
   )
 }
-
-export const Times = memo(TimesComponent, (previous, next) => previous.subtitle.timeRange === next.subtitle.timeRange)

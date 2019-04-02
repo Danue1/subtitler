@@ -46,7 +46,7 @@ export class Time implements Clonable<Time> {
     return this.adder.milliSeconds
   }
 
-  public isEqual(time: Time) {
+  public isEquals(time: Time) {
     return time.adder.timestamp === this.adder.timestamp
   }
   public isLower(time: Time) {

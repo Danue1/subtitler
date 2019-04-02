@@ -66,6 +66,10 @@ const Index = styled(Grid.Horizontal)`
   color: hsl(0 0% 64%);
 `
 
+const SkewedText = styled.span`
+  transform: skew(-8deg);
+`
+
 interface Props {
   readonly index: number
   readonly subtitle: ISubtitle
@@ -101,7 +105,7 @@ const SubtitleComponent: FC<Props> = ({ index, subtitle }) => {
     <Layout ref={layoutRef} className={layoutClassName} onClick={selectCurrentSubtitle}>
       <Index>
         <HashTag />
-        <span>{index + 1}</span>
+        <SkewedText>{index + 1}</SkewedText>
       </Index>
       <Times index={index} subtitle={subtitle} />
       <Textarea
@@ -116,4 +120,7 @@ const SubtitleComponent: FC<Props> = ({ index, subtitle }) => {
   )
 }
 
-export const Subtitle = memo(SubtitleComponent, (previous, next) => previous.subtitle.text === next.subtitle.text)
+export const Subtitle = memo(
+  SubtitleComponent,
+  (previous, next) => previous.index === next.index && previous.subtitle.text === next.subtitle.text
+)
