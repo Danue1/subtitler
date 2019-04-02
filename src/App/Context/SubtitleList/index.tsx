@@ -1,7 +1,8 @@
-import React, { useReducer, Reducer, Dispatch, FC, createContext } from 'react'
-import { Subtitle, createSubtitle, createEmptySubtitle } from './Subtitle'
+import React, { useReducer, Reducer, Dispatch, FC, createContext, useContext } from 'react'
+import { Subtitle } from './Subtitle'
 import { Time } from './Time'
-import { createTimeRange } from './TimeRange'
+import { TimeAdder } from './TimeAdder'
+import { TimeRange } from './TimeRange'
 
 type Context = [State, Dispatch<Action>]
 
@@ -20,20 +21,19 @@ type Action =
       readonly hash: number
     }
   | {
-      readonly type: 'edit::startsAt'
+      readonly type: EditingKind
       readonly hash: number
-      readonly startsAt: Time
-    }
-  | {
-      readonly type: 'edit::endsAt'
-      readonly hash: number
-      readonly endsAt: Time
+      readonly nextTime: Time
     }
   | {
       readonly type: 'edit::text'
       readonly hash: number
       readonly text: string
     }
+
+export type TimeKind = keyof Pick<TimeAdder, 'hours' | 'minutes' | 'seconds' | 'milliSeconds'>
+
+export type EditingKind = 'edit::startsAt' | 'edit::endsAt'
 
 const Context = createContext<Context>([{}, {}] as Context)
 
@@ -51,7 +51,7 @@ const reducer: Reducer<State, Action> = (state, action) => {
       endsAt.addSeconds(10)
       // 자막 리스트 끝에 자막 추가
       if (!nextSubtitle) {
-        const subtitle = createSubtitle(createTimeRange(nextStartsAt, endsAt))
+        const subtitle = Subtitle.create(TimeRange.create(nextStartsAt, endsAt))
         return state.concat(subtitle)
       }
 
@@ -61,19 +61,19 @@ const reducer: Reducer<State, Action> = (state, action) => {
       }
 
       const nextEndsAt = nextSubtitle.timeRange.startsAt.max(endsAt)
-      const subtitle = createSubtitle(createTimeRange(nextStartsAt, nextEndsAt))
+      const subtitle = Subtitle.create(TimeRange.create(nextStartsAt, nextEndsAt))
       state.splice(index + 1, 0, subtitle)
       return [...state]
     }
     case 'remove': {
-      return state.length === 1 ? [createEmptySubtitle()] : state.filter(({ hash }) => hash !== action.hash)
+      return state.length === 1 ? createInitialState() : state.filter(({ hash }) => hash !== action.hash)
     }
     case 'edit::startsAt': {
-      state.find(({ hash }) => hash === action.hash)!.timeRange.startsAt = action.startsAt
+      state.find(({ hash }) => hash === action.hash)!.timeRange.startsAt = action.nextTime
       return [...state]
     }
     case 'edit::endsAt': {
-      state.find(({ hash }) => hash === action.hash)!.timeRange.endsAt = action.endsAt
+      state.find(({ hash }) => hash === action.hash)!.timeRange.endsAt = action.nextTime
       return [...state]
     }
     case 'edit::text': {
@@ -83,11 +83,11 @@ const reducer: Reducer<State, Action> = (state, action) => {
   }
 }
 
-const createInitialState = (): State => [createEmptySubtitle()]
+const createInitialState = (): State => [Subtitle.createEmpty()]
 
 const initialState: State = createInitialState()
 
-export const useSubtitleList = () => useReducer(reducer, initialState)
+export const useSubtitleList = () => useContext(Context)
 
 export const SubtitleListProvider: FC = ({ children }) => {
   const context: Context = useReducer(reducer, initialState)

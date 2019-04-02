@@ -1,108 +1,107 @@
-import { TimeAdder, createTimeAdder } from './TimeAdder'
+import { TimeAdder } from './TimeAdder'
 import { Clonable } from '../../../types/Clonable'
 
-interface Prototype extends Clonable<Time> {
-  readonly hours: number
-  readonly minutes: number
-  readonly seconds: number
-  readonly milliSeconds: number
+export class Time implements Clonable<Time> {
+  public static create(
+    hours: number,
+    minutes: number,
+    seconds: number,
+    milliSeconds: number,
+    isStart: boolean,
+    isEnd: boolean
+  ) {
+    return new Time(hours, minutes, seconds, milliSeconds, isStart, isEnd)
+  }
 
-  readonly isEqual: (time: Time) => boolean
-  readonly isLower: (time: Time) => boolean
-  readonly isHigher: (time: Time) => boolean
+  public static createEmpty(isStart: boolean, isEnd: boolean) {
+    return new Time(0, 0, 0, 0, isStart, isEnd)
+  }
 
-  readonly min: (time: Time) => Time
-  readonly max: (time: Time) => Time
+  public readonly adder: TimeAdder
 
-  readonly addHours: (hours: number) => void
-  readonly addMinutes: (minutes: number) => void
-  readonly addSeconds: (seconds: number) => void
-  readonly addMilliSeconds: (milliSeconds: number) => void
+  private constructor(
+    hours: number,
+    minutes: number,
+    seconds: number,
+    milliSeconds: number,
+    public isStart: boolean,
+    public isEnd: boolean
+  ) {
+    this.adder = TimeAdder.create(hours, minutes, seconds, milliSeconds)
+  }
 
-  readonly toString: () => string
-  readonly valueOf: () => string
-}
+  public get hours() {
+    return this.adder.hours
+  }
+  public get minutes() {
+    return this.adder.minutes
+  }
+  public get seconds() {
+    return this.adder.seconds
+  }
+  public get milliSeconds() {
+    return this.adder.milliSeconds
+  }
 
-const prototype: Prototype = {
-  get hours() {
-    const self = this as Time
-    return self.adder.hours
-  },
-  get minutes() {
-    const self = this as Time
-    return self.adder.minutes
-  },
-  get seconds() {
-    const self = this as Time
-    return self.adder.seconds
-  },
-  get milliSeconds() {
-    const self = this as Time
-    return self.adder.milliSeconds
-  },
-  isEqual(time) {
+  public isEqual(time: Time) {
     return time.valueOf() === this.valueOf()
-  },
-  isLower(time) {
+  }
+  public isLower(time: Time) {
     return time.valueOf() < this.valueOf()
-  },
-  isHigher(time) {
+  }
+  public isHigher(time: Time) {
     return time.valueOf() > this.valueOf()
-  },
-  min(time) {
+  }
+
+  min(time: Time) {
     const minTime = this.isLower(time) ? time : this
     return minTime.clone()
-  },
-  max(time) {
+  }
+  max(time: Time) {
     const minTime = this.isHigher(time) ? time : this
     return minTime.clone()
-  },
-  addHours(hours) {
-    const self = this as Time
-    self.adder.add(hours, 0, 0, 0)
-  },
-  addMinutes(minutes) {
-    const self = this as Time
-    self.adder.add(0, minutes, 0, 0)
-  },
-  addSeconds(seconds) {
-    const self = this as Time
-    self.adder.add(0, 0, seconds, 0)
-  },
-  addMilliSeconds(milliSeconds) {
-    const self = this as Time
-    self.adder.add(0, 0, 0, milliSeconds)
-  },
+  }
+
+  addHours(hours: number) {
+    this.adder.hours += hours
+  }
+  addMinutes(minutes: number) {
+    this.adder.minutes += minutes
+  }
+  addSeconds(seconds: number) {
+    this.adder.seconds += seconds
+  }
+  addMilliSeconds(milliSeconds: number) {
+    this.adder.milliSeconds += milliSeconds
+  }
+  add(hours: number, minutes: number, seconds: number, milliSeconds: number) {
+    this.adder.add(hours, minutes, seconds, milliSeconds)
+  }
+
+  setStart(isStart: boolean) {
+    this.isStart = isStart
+  }
+  setEnd(isEnd: boolean) {
+    this.isEnd = isEnd
+  }
+
   clone() {
-    const self = this as Time
-    return createTime(self.hours, self.minutes, self.seconds, self.milliSeconds)
-  },
+    return new Time(this.hours, this.minutes, this.seconds, this.milliSeconds, false, false)
+  }
+
   toString() {
-    const self = this as Time
-    const minutes = self.minutes.toString().padStart(2, '0')
-    const seconds = self.seconds.toString().padStart(2, '0')
-    const milliSeconds = self.milliSeconds.toString().padStart(3, '0')
-    return `${self.hours}:${minutes}:${seconds}.${milliSeconds}`
-  },
+    const hours = this.hours.toString().padStart(2, '0')
+    const minutes = this.minutes.toString().padStart(2, '0')
+    const seconds = this.seconds.toString().padStart(2, '0')
+    const milliSeconds = this.milliSeconds.toString().padStart(3, '0')
+    return `${hours}:${minutes}:${seconds}.${milliSeconds}`
+  }
+
   valueOf() {
-    const self = this as Time
-    const hours = self.hours.toString().padStart(2, '0')
-    const minutes = self.minutes.toString().padStart(2, '0')
-    const seconds = self.seconds.toString().padStart(2, '0')
-    const milliSeconds = self.milliSeconds.toString().padStart(3, '0')
+    const hours = this.hours.toString().padStart(2, '0')
+    const minutes = this.minutes.toString().padStart(2, '0')
+    const seconds = this.seconds.toString().padStart(2, '0')
+    const milliSeconds = this.milliSeconds.toString().padStart(3, '0')
     return hours + minutes + seconds + milliSeconds
   }
 }
-
-export interface Time extends Prototype {
-  readonly adder: TimeAdder
-}
-
-export const createTime = (hours: number, minutes: number, seconds: number, milliSeconds: number): Time =>
-  Object.create(prototype, {
-    adder: {
-      value: createTimeAdder(hours, minutes, seconds, milliSeconds)
-    }
-  })
-
-export const createEmptyTime = (): Time => createTime(0, 0, 0, 0)

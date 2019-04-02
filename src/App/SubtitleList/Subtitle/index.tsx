@@ -1,40 +1,42 @@
-import React, { FC, memo, useRef } from 'react'
+import React, { FC, memo, useRef, ChangeEventHandler, MouseEventHandler } from 'react'
+import classNames from 'classnames'
 import styled from 'styled-components'
 import { Grid } from '../../../Atomics/Grid'
 import { Div } from '../../../Atomics/Div'
 import { Buttons } from './Buttons'
-import { EditableTime } from './EditableTime'
 import { useSubtitleList } from '../../Context/SubtitleList'
-import { EditingKind, useCurrentSubtitle } from '../../Context/CurrentSubtitle'
 import { Subtitle as ISubtitle } from '../../Context/SubtitleList/Subtitle'
+import { Times } from './Times'
+import { useCurrentSubtitle } from '../../Context/CurrentSubtitle'
 
 const Textarea = styled.textarea`
   overflow: hidden;
   resize: none;
 
   color: hsl(0 0% 36%);
-  box-shadow: 0 0 0 1px hsl(0 0% 92%);
+  border: 1px solid hsl(0 0% 92%);
 
   &:hover,
   &:focus {
-    box-shadow: 0 0 0 1px hsl(210 100% 84%);
+    border-color: hsl(210 100% 84%);
   }
 
   &:focus.RemovingHint {
-    box-shadow: 0 0 0 1px hsl(0 0% 84%);
+    border-color: hsl(0 0% 84%);
   }
 `
 
 const Layout = styled(Grid.Horizontal)`
   grid-gap: 0.5rem;
-  grid-template-columns: min-content min-content min-content 1fr min-content;
+  grid-template-columns: min-content min-content 1fr min-content;
 
   padding: 0.5rem;
   padding-left: 1rem;
 
   border-bottom: 2px solid transparent;
 
-  &:hover {
+  &:hover,
+  &.Selected {
     background-color: hsl(0 0% 96%);
 
     ${Textarea} {
@@ -75,38 +77,31 @@ const resizeTextareaHeight = (textarea: HTMLTextAreaElement) => {
 
 const SubtitleComponent: FC<Props> = ({ index, subtitle }) => {
   const [, dispatchSubtitleList] = useSubtitleList()
-  const [, dispatchCurrentSubtitle] = useCurrentSubtitle()
+  const [currentSubtitle, dispatchCurrentSubtitle] = useCurrentSubtitle()
 
   const layoutRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const { timeRange, text, hash } = subtitle
+  const layoutClassName = classNames({
+    Selected: subtitle.hash === currentSubtitle.hash
+  })
 
-  const updateTextarea = (hash: number, currentTarget: HTMLTextAreaElement) => {
-    dispatchSubtitleList({ type: 'edit::text', hash, text: currentTarget.value })
+  const selectCurrentSubtitle: MouseEventHandler<HTMLDivElement> = event => {
+    event.stopPropagation()
+    dispatchCurrentSubtitle({ type: 'select', subtitle })
+  }
+
+  const updateTextarea: ChangeEventHandler<HTMLTextAreaElement> = ({ currentTarget }) => {
+    dispatchSubtitleList({ type: 'edit::text', hash: subtitle.hash, text: currentTarget.value })
     resizeTextareaHeight(currentTarget)
   }
 
   return (
-    <Layout ref={layoutRef}>
+    <Layout ref={layoutRef} className={layoutClassName} onClick={selectCurrentSubtitle}>
       <Index>#{index}</Index>
-      <EditableTime
-        time={timeRange.startsAt}
-        hash={hash}
-        openModal={() => dispatchCurrentSubtitle({ type: 'editing::startsAt', subtitle })}
-      />
-      <EditableTime
-        time={timeRange.endsAt}
-        hash={hash}
-        openModal={() => dispatchCurrentSubtitle({ type: 'editing::endsAt', subtitle })}
-      />
-      <Textarea
-        ref={textareaRef}
-        rows={1}
-        defaultValue={text}
-        onChange={({ currentTarget }) => updateTextarea(hash, currentTarget)}
-      />
-      <Buttons hash={hash} layoutRef={layoutRef} textareaRef={textareaRef} />
+      <Times index={index} subtitle={subtitle} />
+      <Textarea ref={textareaRef} rows={1} defaultValue={subtitle.text} onChange={updateTextarea} />
+      <Buttons hash={subtitle.hash} layoutRef={layoutRef} textareaRef={textareaRef} />
     </Layout>
   )
 }

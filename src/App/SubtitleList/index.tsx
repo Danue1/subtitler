@@ -3,8 +3,6 @@ import styled from 'styled-components'
 import { Div } from '../../Atomics/Div'
 import { Subtitle } from './Subtitle'
 import { useSubtitleList } from '../Context/SubtitleList'
-import { Modal } from '../../Components/Modal'
-import { TimeEditor } from './TimeEditor'
 import { useCurrentSubtitle } from '../Context/CurrentSubtitle'
 
 const Layout = styled(Div)`
@@ -25,18 +23,19 @@ const Scroll = styled(Div)`
 
 export const SubtitleList: FC = () => {
   const [subtitleList] = useSubtitleList()
-  const [{ kind }] = useCurrentSubtitle()
+  const [, dispatchCurrentSubtitle] = useCurrentSubtitle()
+
+  const resetCurrentSubtitle = () => {
+    dispatchCurrentSubtitle({ type: 'reset' })
+  }
 
   return (
-    <Layout>
+    <Layout onClick={resetCurrentSubtitle}>
       <Scroll>
         {subtitleList.map((subtitle, index) => (
           <Subtitle key={subtitle.hash} index={index} subtitle={subtitle} />
         ))}
       </Scroll>
-      <Modal isOpen={kind === 'editing::startsAt' || kind === 'editing::endsAt'}>
-        <TimeEditor />
-      </Modal>
     </Layout>
   )
 }

@@ -94,4 +94,4 @@ const ButtonsComponent: FC<Props> = ({ hash, layoutRef, textareaRef }) => {
   )
 }
 
-export const Buttons = memo(ButtonsComponent, () => false)
+export const Buttons = memo(ButtonsComponent, () => true)
