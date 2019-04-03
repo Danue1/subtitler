@@ -44,14 +44,12 @@ const Layout = styled(Grid.Horizontal)`
     }
   }
 
-  &.RemovingHint {
-    &:hover {
+  &:hover {
+    &.RemovingHint {
       background-color: hsl(0 100% 96%);
     }
-  }
 
-  &.AddingHint {
-    &:hover {
+    &.AddingHint {
       border-bottom-color: hsl(210 100% 84%);
     }
   }

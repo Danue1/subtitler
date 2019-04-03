@@ -1,0 +1,3 @@
+export const TIME_SCALE_RESOLUTION = 2
+export const TIME_SCALE_OFFSET_WIDTH = 50
+export const TIME_SCALE_HEIGHT = 24

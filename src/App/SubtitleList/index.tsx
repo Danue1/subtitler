@@ -9,7 +9,11 @@ import { Grid } from '../../Atomics/Grid'
 const Layout = styled(Grid.Horizontal)`
   overflow: hidden;
 
+  height: 100%;
+
   border-radius: 0.25rem;
+
+  transition-property: box-shadow;
 
   &:hover {
     box-shadow: 0 0 0 1px hsl(0 0% 92%);
@@ -18,8 +22,7 @@ const Layout = styled(Grid.Horizontal)`
 
 const Scroll = styled(Div)`
   overflow: hidden scroll;
-
-  height: 18rem;
+  scroll-behavior: smooth;
 `
 
 export const SubtitleList: FC = () => {

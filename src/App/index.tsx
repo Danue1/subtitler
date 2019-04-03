@@ -18,9 +18,9 @@ const Layout = styled(Div)`
 const Main = styled(Grid.Horizontal)`
   grid-gap: 1rem;
   grid-template:
-    'SubtitleList VideoPlayer' 18rem
-    'Timeline Timeline' 1fr
-    / 1fr min-content;
+    'VideoPlayer Timeline' 18rem
+    'SubtitleList SubtitleList' calc(100vh - 24rem)
+    / 32rem 45rem;
 
   max-width: var(--max-width);
   width: 100%;
