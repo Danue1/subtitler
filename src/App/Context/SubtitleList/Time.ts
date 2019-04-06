@@ -30,7 +30,7 @@ export class Time implements Clonable<Time> {
     this.adder = TimeAdder.create(hours, minutes, seconds, milliSeconds)
   }
 
-  public get time() {
+  public get timestamp() {
     return this.adder.timestamp
   }
   public get hours() {

@@ -1,16 +1,19 @@
 import React, { FC } from 'react'
 import styled from 'styled-components'
-import { Div } from '../../Atomics/Div'
 import { SubtitleList } from './SubtitleList'
 import { TimeScale } from './TimeScale'
+import { Grid } from '../../Atomics/Grid'
 
-const Layout = styled(Div)`
+const Layout = styled(Grid.Layout)`
   overflow: scroll hidden;
+
+  grid-gap: 0.5rem;
+  grid-template-rows: min-content 1fr;
 
   height: 100%;
 
+  border-top: 1px solid hsl(0 0% 84%);
   border-radius: 0.25rem;
-  box-shadow: 0 0 0 1px hsl(0 0% 92%);
 `
 
 export const Timeline: FC = () => (

@@ -26,6 +26,7 @@ export const useTimeScale = () => {
       timeScaleCount /= 2
     }
 
+    context.translate(0.5, 0.5)
     context.lineWidth = 1
     context.strokeStyle = 'hsl(0 0% 84%)'
     context.stroke(path)

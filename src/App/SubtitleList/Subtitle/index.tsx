@@ -1,4 +1,4 @@
-import React, { FC, memo, useRef, ChangeEventHandler, EventHandler, SyntheticEvent } from 'react'
+import React, { FC, memo, useRef, ChangeEventHandler, EventHandler, SyntheticEvent, useEffect } from 'react'
 import classNames from 'classnames'
 import styled from 'styled-components'
 import { Grid } from '../../../Atomics/Grid'
@@ -120,5 +120,5 @@ const SubtitleComponent: FC<Props> = ({ index, subtitle }) => {
 
 export const Subtitle = memo(
   SubtitleComponent,
-  (previous, next) => previous.index === next.index && previous.subtitle.text === next.subtitle.text
+  (previous, next) => previous.index === next.index && previous.subtitle === next.subtitle
 )

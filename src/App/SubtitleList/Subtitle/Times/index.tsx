@@ -1,4 +1,4 @@
-import React, { FC, ChangeEventHandler, KeyboardEventHandler } from 'react'
+import React, { FC, ChangeEventHandler, KeyboardEventHandler, memo } from 'react'
 import styled from 'styled-components'
 import { Subtitle } from '../../../Context/SubtitleList/Subtitle'
 import { Grid } from '../../../../Atomics/Grid'
@@ -26,7 +26,7 @@ interface Props {
   readonly subtitle: Subtitle
 }
 
-export const Times: FC<Props> = ({ index, subtitle }) => {
+const TimesComponent: FC<Props> = ({ index, subtitle }) => {
   const [subtitleList, dispatchSubtitleList] = useSubtitleList()
 
   const { timeRange, hash } = subtitle
@@ -81,7 +81,11 @@ export const Times: FC<Props> = ({ index, subtitle }) => {
 
     const { hours, minutes, seconds, milliSeconds } = time
     const timeInfo = { hours, minutes, seconds, milliSeconds }
-    timeInfo[timeKind] += 1 * Math.sign((Arrows[event.key as any] as any) as number)
+    if (timeKind === 'milliSeconds') {
+      timeInfo[timeKind] += 10 * Math.sign((Arrows[event.key as any] as any) as number)
+    } else {
+      timeInfo[timeKind] += 1 * Math.sign((Arrows[event.key as any] as any) as number)
+    }
     const cachedTime = ITime.create(
       timeInfo.hours,
       timeInfo.minutes,
@@ -121,3 +125,5 @@ export const Times: FC<Props> = ({ index, subtitle }) => {
     </Layout>
   )
 }
+
+export const Times = memo(TimesComponent, (previous, next) => previous.subtitle === next.subtitle)

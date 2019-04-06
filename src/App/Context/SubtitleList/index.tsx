@@ -76,12 +76,30 @@ const reducer: Reducer<State, Action> = (state, action) => {
       return state.length === 1 ? createInitialState() : state.filter(({ hash }) => hash !== action.hash)
     }
     case 'edit::startsAt': {
-      state.find(({ hash }) => hash === action.hash)!.timeRange.startsAt = action.nextTime
-      return [...state]
+      // state.find(({ hash }) => hash === action.hash)!.timeRange.startsAt = action.nextTime
+      // return [...state]
+      return state.map(subtitle => {
+        if (subtitle.hash !== action.hash) {
+          return subtitle
+        }
+        const nextSubtitle = subtitle.clone()
+        nextSubtitle.text = subtitle.text
+        nextSubtitle.timeRange.startsAt = action.nextTime
+        nextSubtitle.timeRange.endsAt.setEnd(true)
+        return nextSubtitle
+      })
     }
     case 'edit::endsAt': {
-      state.find(({ hash }) => hash === action.hash)!.timeRange.endsAt = action.nextTime
-      return [...state]
+      return state.map(subtitle => {
+        if (subtitle.hash !== action.hash) {
+          return subtitle
+        }
+        const nextSubtitle = subtitle.clone()
+        nextSubtitle.text = subtitle.text
+        nextSubtitle.timeRange.endsAt = action.nextTime
+        nextSubtitle.timeRange.startsAt.setStart(true)
+        return nextSubtitle
+      })
     }
     case 'edit::text': {
       state.find(({ hash }) => hash === action.hash)!.text = action.text
