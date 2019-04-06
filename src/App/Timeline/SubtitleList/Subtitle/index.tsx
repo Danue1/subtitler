@@ -12,7 +12,7 @@ const Layout = styled(Grid.Horizontal)`
   position: absolute;
   top: 0;
 
-  grid-template-columns: 1.5rem min-content;
+  grid-template-columns: 1.5rem min-content min-content;
   align-items: center;
 
   color: hsl(0 0% 64%);
@@ -28,6 +28,10 @@ const Layout = styled(Grid.Horizontal)`
 
 const Index = styled(Div)`
   transform: rotate(8deg);
+`
+
+const Text = styled.span`
+  margin-left: 0.5rem;
 `
 
 interface Props {
@@ -52,6 +56,7 @@ const SubtitleComponent: FC<Props> = ({ index, subtitle, isSelected, onSelect })
     <Layout className={layoutClassName} onClick={onSelect} style={style}>
       <HashTag />
       <Index>{index}</Index>
+      <Text>{subtitle.text}</Text>
     </Layout>
   )
 }
@@ -61,5 +66,6 @@ export const Subtitle = memo(
   (previous, next) =>
     previous.index === next.index &&
     previous.isSelected === next.isSelected &&
+    previous.subtitle.text === next.subtitle.text &&
     previous.subtitle.timeRange === next.subtitle.timeRange
 )

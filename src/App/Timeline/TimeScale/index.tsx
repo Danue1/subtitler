@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import styled from 'styled-components'
 import { useTimeScale } from './useTimeScale'
-import { TIME_SCALE_HEIGHT, TIME_SCALE_RESOLUTION } from '../../../constants/TimeScale'
+import { TIME_SCALE_HEIGHT, TIME_SCALE_RESOLUTION, TIME_SCALE_OFFSET_WIDTH } from '../../../constants/TimeScale'
 import { useMaximumTime } from '../../Context/MaximumTime'
 
 const Canvas = styled.canvas`
@@ -9,7 +9,11 @@ const Canvas = styled.canvas`
 `
 
 export const TimeScale: FC = () => {
-  const [{ canvasWidth }] = useMaximumTime()
+  const { totalMinutes } = useMaximumTime()
   const canvasRef = useTimeScale()
-  return <Canvas ref={canvasRef} width={canvasWidth} height={TIME_SCALE_HEIGHT * TIME_SCALE_RESOLUTION} />
+
+  const width = totalMinutes * TIME_SCALE_OFFSET_WIDTH * TIME_SCALE_RESOLUTION
+  const HEIGHT = TIME_SCALE_HEIGHT * TIME_SCALE_RESOLUTION
+
+  return <Canvas ref={canvasRef} width={width} height={HEIGHT} />
 }

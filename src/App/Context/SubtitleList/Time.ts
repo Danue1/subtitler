@@ -99,4 +99,8 @@ export class Time implements Clonable<Time> {
     const milliSeconds = this.milliSeconds.toString().padStart(3, '0')
     return `${hours}:${minutes}:${seconds}.${milliSeconds}`
   }
+
+  public valueOf() {
+    return this.timestamp / 1000
+  }
 }

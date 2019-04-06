@@ -5,12 +5,10 @@ import { TimeScale } from './TimeScale'
 import { Grid } from '../../Atomics/Grid'
 
 const Layout = styled(Grid.Layout)`
-  overflow: scroll hidden;
+  overflow: hidden;
 
   grid-gap: 0.5rem;
-  grid-template-rows: min-content 1fr;
-
-  height: 100%;
+  grid-template-rows: min-content min-content;
 
   border-top: 1px solid hsl(0 0% 84%);
   border-radius: 0.25rem;

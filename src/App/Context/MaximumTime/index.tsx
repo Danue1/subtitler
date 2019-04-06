@@ -1,62 +1,27 @@
-import React, { FC, createContext, useContext, Dispatch, useReducer, Reducer } from 'react'
+import React, { FC, createContext, useContext, useMemo } from 'react'
+import { useSubtitleList } from '../SubtitleList'
 import { Time } from '../SubtitleList/Time'
-import { TIME_SCALE_OFFSET_WIDTH, TIME_SCALE_RESOLUTION } from '../../../constants/TimeScale'
 
-type Context = [State, Dispatch<Action>]
+type Context = State
 
 interface State {
   readonly time: Time
-  readonly canvasWidth: number
   readonly totalMinutes: number
 }
 
-type Action =
-  | {
-      readonly type: 'reset'
-    }
-  | {
-      readonly type: 'update'
-      readonly time: Time
-    }
-
-const Context = createContext<Context>([{}, {}] as Context)
-
-const reducer: Reducer<State, Action> = (state, action) => {
-  switch (action.type) {
-    case 'reset': {
-      return createInitialState()
-    }
-    case 'update': {
-      const { time } = action
-      const totalMinutes = (time.hours * 60 + time.minutes) * 60 + time.seconds
-      const canvasWidth = totalMinutes * TIME_SCALE_OFFSET_WIDTH * TIME_SCALE_RESOLUTION
-
-      return {
-        time,
-        totalMinutes,
-        canvasWidth
-      }
-    }
-  }
-}
-
-const createInitialState = (): State => {
-  const time = Time.create(0, 1, 0, 0, false, false)
-  const totalMinutes = (time.hours * 60 + time.minutes) * 60 + time.seconds
-  const canvasWidth = totalMinutes * TIME_SCALE_OFFSET_WIDTH * TIME_SCALE_RESOLUTION
-
-  return {
-    time,
-    totalMinutes,
-    canvasWidth
-  }
-}
-
-const initialState = createInitialState()
+const Context = createContext<Context>({} as Context)
 
 export const useMaximumTime = () => useContext(Context)
 
 export const MaximumProvider: FC = ({ children }) => {
-  const context = useReducer(reducer, initialState)
-  return <Context.Provider value={context}>{children}</Context.Provider>
+  const [subtitleList] = useSubtitleList()
+  const totalMinutes = useMemo(() => {
+    const lastSubtitle = subtitleList[subtitleList.length - 1]
+    return {
+      time: lastSubtitle.timeRange.endsAt,
+      totalMinutes: lastSubtitle.timeRange.endsAt.timestamp / 1000
+    }
+  }, [subtitleList])
+
+  return <Context.Provider value={totalMinutes}>{children}</Context.Provider>
 }

@@ -109,6 +109,7 @@ const SubtitleComponent: FC<Props> = ({ index, subtitle }) => {
       <Textarea
         ref={textareaRef}
         rows={1}
+        spellCheck={false}
         defaultValue={subtitle.text}
         onFocus={selectCurrentSubtitle}
         onChange={updateTextarea}

@@ -102,8 +102,16 @@ const reducer: Reducer<State, Action> = (state, action) => {
       })
     }
     case 'edit::text': {
-      state.find(({ hash }) => hash === action.hash)!.text = action.text
-      return [...state]
+      return state.map(subtitle => {
+        if (subtitle.hash !== action.hash) {
+          return subtitle
+        }
+        const nextSubtitle = subtitle.clone()
+        nextSubtitle.text = action.text
+        nextSubtitle.timeRange.startsAt.setStart(true)
+        nextSubtitle.timeRange.endsAt.setEnd(true)
+        return nextSubtitle
+      })
     }
   }
 }

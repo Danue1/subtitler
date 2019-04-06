@@ -8,6 +8,8 @@ import { Subtitle as ISubtitle } from '../../Context/SubtitleList/Subtitle'
 
 const Layout = styled(Div)`
   position: relative;
+
+  height: 2rem;
 `
 
 export const SubtitleList: FC = () => {

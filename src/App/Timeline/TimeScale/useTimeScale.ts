@@ -4,7 +4,7 @@ import { Time } from '../../Context/SubtitleList/Time'
 import { TIME_SCALE_OFFSET_WIDTH, TIME_SCALE_RESOLUTION, TIME_SCALE_HEIGHT } from '../../../constants/TimeScale'
 
 export const useTimeScale = () => {
-  const [maximumTime] = useMaximumTime()
+  const maximumTime = useMaximumTime()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const drawTimeScale = () => {
@@ -31,7 +31,7 @@ export const useTimeScale = () => {
     context.strokeStyle = 'hsl(0 0% 84%)'
     context.stroke(path)
   }
-  useEffect(drawTimeScale, [maximumTime])
+  useEffect(drawTimeScale, [maximumTime.totalMinutes])
 
   const drawTimeString = () => {
     const TIME_SCALE_OFFSET = TIME_SCALE_OFFSET_WIDTH * TIME_SCALE_RESOLUTION
@@ -66,7 +66,7 @@ export const useTimeScale = () => {
       isTimeChanged = true
     }
   }
-  useEffect(drawTimeString, [maximumTime])
+  useEffect(drawTimeString, [maximumTime.totalMinutes])
 
   return canvasRef
 }
